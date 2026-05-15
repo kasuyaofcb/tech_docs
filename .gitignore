@@ -1,0 +1,49 @@
+# --- OS (macOS / Windows) ---
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# --- AI ツール ローカル設定 ---
+.claude/
+.cursor/
+.aider*
+.continue/
+
+# --- Secrets / 環境変数 ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- ログ / 一時ファイル ---
+*.log
+*.tmp
+*.bak
+*.orig
+
+# --- ビルド成果物（将来 静的サイト化したとき用） ---
+node_modules/
+dist/
+build/
+.next/
+.cache/
+out/
+
+# --- 個人メモ（コミットしたくない下書き置き場） ---
+drafts/
+scratch/
+*.private.md
