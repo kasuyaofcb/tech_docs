@@ -32,7 +32,7 @@ flowchart TB
 
 アプリはSupabaseが用意したSDKを呼ぶだけで、サーバーコードを書かなくても「DB読み書き／ログイン／ファイル保存」が動く。
 
-> 📝 中心にあるのは **Postgres**。Auth も Storage も Realtime も、内部的には Postgres のテーブルに紐づいている。「全部Postgresの上に乗っている」と理解すると一気に見通しがよくなる。
+> 📝 中心にあるのは **Postgres**。AuthもStorageもRealtimeも、内部的にはPostgresのテーブルに紐づいている。「全部Postgresの上に乗っている」と理解すると一気に見通しがよくなる。
 
 ---
 
@@ -82,17 +82,17 @@ flowchart TB
 
 ---
 
-## 3. はじめの一歩（Hello World）
+## 3. はじめの一歩
 
-概念の話の前に、**5分で手を動かせる流れ**を見ておく。
+何から始めるのか、迷わないように流れだけ押さえる。
 
 ```mermaid
 flowchart LR
     S1["① supabase.com<br/>サインアップ"] ==> S2["② New project<br/>リージョン・<br/>DBパスワード設定"]
     S2 ==> S3["③ Settings → API<br/><b>URL と anon key</b> をコピー"]
-    S3 ==> S4["④ <b>npm install</b><br/>@supabase/supabase-js"]
+    S3 ==> S4["④ SDKをインストール"]
     S4 ==> S5["⑤ createClient<br/>で接続"]
-    S5 ==> S6["⑥ 最初の select"]
+    S5 ==> S6["⑥ テーブル操作開始"]
 
     style S1 fill:#3ECF8E,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S2 fill:#3ECF8E,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -102,23 +102,7 @@ flowchart LR
     style S6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-### 接続コード（これがすべての出発点）
-
-```ts
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  'https://xxxxxxxx.supabase.co', // ← Project URL
-  'eyJhbGciOi...'                  // ← anon key
-)
-
-// 最初の読み出し
-const { data, error } = await supabase
-  .from('posts')
-  .select('*')
-```
-
-> 📝 `xxxxxxxx` の部分はプロジェクトごとに違う。**URLとanon keyは公開してOK**（後述§12参照）。逆に`service_role` key を貼り付けると終わるので絶対やらない。
+> 📝 `createClient(URL, anon_key)` を呼ぶだけで接続完了。あとはテーブル名を指定してSDKを叩く、というのが基本動作。
 
 ### 💸 無料枠（Free tier）の主な制限
 
@@ -130,13 +114,13 @@ const { data, error } = await supabase
 | Edge Functions実行 | 50万回/月 | 大量呼び出しに注意 |
 | 非アクティブ | 1週間使わないと一時停止 | ログインで復活 |
 
-> 🚨 個人開発なら無料枠で十分。本番サービスに乗せるなら Pro 以上推奨（バックアップ7日 → 7日以上に伸びる、自動停止なし）。
+> 🚨 個人開発なら無料枠で十分。本番サービスに乗せるならPro以上推奨（バックアップ7日 → 7日以上に伸びる、自動停止なし）。
 
 ---
 
 ## 4. Database — Postgres と自動API
 
-Supabaseで「テーブルを作る」と、**REST API と GraphQL API が自動で生える**。サーバーコードを書かずに、フロントから読み書きできる。
+Supabaseで「テーブルを作る」と、**REST APIとGraphQL APIが自動で生える**。サーバーコードを書かずに、フロントから読み書きできる。
 
 ```mermaid
 flowchart LR
@@ -150,23 +134,20 @@ flowchart LR
     style APP fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-### SDKでの読み書きイメージ
+### SDKでできる4つの基本操作
 
-```ts
-// 📥 select
-const { data } = await supabase
-  .from('posts')
-  .select('*')
-  .eq('user_id', userId)
+```mermaid
+flowchart TB
+    Q["❓ やりたいこと"] ==> R["📥 <b>select</b><br/>読み出す"]
+    Q ==> I["📤 <b>insert</b><br/>追加する"]
+    Q ==> U["✏️ <b>update</b><br/>更新する"]
+    Q ==> D["🗑️ <b>delete</b><br/>削除する"]
 
-// 📤 insert
-await supabase.from('posts').insert({ title: 'Hi', user_id: userId })
-
-// ✏️ update
-await supabase.from('posts').update({ title: 'Hi2' }).eq('id', 1)
-
-// 🗑️ delete
-await supabase.from('posts').delete().eq('id', 1)
+    style Q fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style R fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style I fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style U fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style D fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
 > 📝 内部では [PostgREST](https://postgrest.org/) がテーブル定義からAPIを動的に生成している。**「DBスキーマがそのままAPI仕様になる」**のがSupabaseの肝。
@@ -189,7 +170,7 @@ flowchart LR
     style NG fill:#C0392B,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-RLSは「**この行を見せていいか／変えていいか**」を**SQLで書くルール**。Postgres本体の機能で、Supabaseが独自に実装したものではない。
+RLSは「**この行を見せていいか／変えていいか**」を**ルールとしてDBに登録**しておく仕組み。Postgres本体の機能で、Supabaseが独自に実装したものではない。
 
 ### RLSのイメージ（postsテーブル）
 
@@ -214,57 +195,29 @@ flowchart TB
     style V2 fill:#C0392B,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-### 実物のSQL — 定番4ポリシー
-
-「**自分の投稿だけ読み書きできる**」を実装する例。コピペで動く。
-
-```sql
--- ① RLSを有効化（これだけだと「全部拒否」状態）
-alter table posts enable row level security;
-
--- ② 読む: 自分の投稿だけ select できる
-create policy "Users can read own posts"
-  on posts for select
-  using ( auth.uid() = user_id );
-
--- ③ 作る: user_id が自分のものなら insert OK
-create policy "Users can insert own posts"
-  on posts for insert
-  with check ( auth.uid() = user_id );
-
--- ④ 更新: 自分の投稿だけ update できる
-create policy "Users can update own posts"
-  on posts for update
-  using ( auth.uid() = user_id );
-
--- ⑤ 削除: 自分の投稿だけ delete できる
-create policy "Users can delete own posts"
-  on posts for delete
-  using ( auth.uid() = user_id );
-```
-
-### `using` と `with check` の違い
+### ポリシーは3つの要素でできている
 
 ```mermaid
-flowchart TB
-    U["<b>using</b><br/>「既存の行に対する条件」"] ==> U1["select / update / delete で使う<br/>👉「この行触っていい？」"]
-    C["<b>with check</b><br/>「新しい行に対する条件」"] ==> C1["insert / update で使う<br/>👉「この内容で保存していい？」"]
+flowchart LR
+    P["📜 1つのポリシー"] ==> C1["🎯 <b>対象テーブル</b><br/>例: posts"]
+    P ==> C2["🔧 <b>操作の種類</b><br/>SELECT / INSERT<br/>UPDATE / DELETE"]
+    P ==> C3["✅ <b>許可する条件</b><br/>例: auth.uid() = user_id"]
 
-    style U fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style C fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style U1 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
-    style C1 fill:#fff,color:#000,stroke:#8E44AD,stroke-width:2px
+    style P fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style C1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style C2 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style C3 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 update は両方使うことがある（「自分の行だけ更新でき、user_idを他人にすり替えられない」を表現するなら `using = with check`）。
+> 📝 「**postsテーブルのSELECTは、`auth.uid() = user_id` の行だけ許可**」というルールを4種類（読む・作る・更新・削除）書けば、自分のデータだけ触れる状態が完成。
 
 ### ⚠️ 鉄則: RLSは「デフォルトで有効化」
 
 ```mermaid
 flowchart LR
     S1["😱 RLSをオフのまま<br/>公開"] ==> S2["❌ 誰でも全行<br/>読み書き可能"]
-    S2 ==> S3["✅ <b>ALTER TABLE posts<br/>ENABLE ROW LEVEL SECURITY;</b>"]
-    S3 ==> S4["✅ ポリシーを書く<br/>CREATE POLICY ..."]
+    S2 ==> S3["✅ テーブルごとに<br/>RLSを有効化"]
+    S3 ==> S4["✅ ポリシーを<br/>1つ以上登録"]
 
     style S1 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
@@ -272,7 +225,7 @@ flowchart LR
     style S4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 🚨 RLSを有効化しただけだと「**何も許可されていない**＝全部拒否」。**ポリシー（CREATE POLICY）を書いて初めて読み書きできる**。Supabaseダッシュボードは「RLS未有効テーブル」を警告してくれる。
+> 🚨 RLSを有効化しただけだと「**何も許可されていない＝全部拒否**」。**ポリシーを書いて初めて読み書きできる**。Supabaseダッシュボードは「RLS未有効テーブル」を警告してくれる。
 
 ---
 
@@ -294,27 +247,11 @@ flowchart LR
     style DB fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-### Auth のコード例
-
-```ts
-// サインアップ
-await supabase.auth.signUp({ email, password })
-
-// ログイン
-await supabase.auth.signInWithPassword({ email, password })
-
-// 現在のユーザー
-const { data: { user } } = await supabase.auth.getUser()
-
-// ログアウト
-await supabase.auth.signOut()
-```
-
 ### Auth × RLS の連動
 
 ```mermaid
 flowchart TB
-    L["① ログイン<br/>supabase.auth.signInWithPassword(...)"] ==> J["② JWT発行<br/>中身: { sub: ユーザーID, ... }"]
+    L["① ログイン操作"] ==> J["② JWT発行<br/>中身: { sub: ユーザーID, ... }"]
     J ==> Q["③ DBアクセス時、JWTが自動添付"]
     Q ==> P["④ RLS が <b>auth.uid()</b> で<br/>そのIDを参照"]
     P ==> R["⑤ 「自分の行だけ」が返る"]
@@ -364,42 +301,21 @@ flowchart LR
     style PR fill:#fff,color:#000,stroke:#3498DB
 ```
 
-### 実装（コピペで動く）
+### サインアップ時に自動でprofilesを作る
 
-```sql
--- ① プロフィールテーブルを作る
-create table public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  username text unique,
-  avatar_url text,
-  bio text,
-  updated_at timestamptz default now()
-);
+「`auth.users` に行が追加されたら、`public.profiles` にも同じIDで行を自動作成する」をDB側で仕込んでおく（**トリガー**という仕組み）。これで抜け漏れがなくなる。
 
--- ② RLSを有効化 + 「自分のプロフィールだけ編集できる」
-alter table public.profiles enable row level security;
+```mermaid
+sequenceDiagram
+    participant U as 👤 ユーザー
+    participant A as 🔐 auth.users
+    participant T as ⚡ トリガー
+    participant P as 📋 public.profiles
 
-create policy "Profiles are viewable by everyone"
-  on profiles for select using ( true );
-
-create policy "Users can update own profile"
-  on profiles for update using ( auth.uid() = id );
-
--- ③ サインアップ時、profiles 行を自動作成するトリガー
-create function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  insert into public.profiles (id) values (new.id);
-  return new;
-end;
-$$;
-
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
+    U->>A: サインアップ
+    A->>T: 行が追加されたぞ！
+    T->>P: 同じidで行を自動作成
+    Note over P: ✨ 抜け漏れゼロ
 ```
 
 ### 何が嬉しいの？
@@ -407,7 +323,7 @@ create trigger on_auth_user_created
 ```mermaid
 flowchart TB
     Q["✨ メリット"] ==> M1["✅ <b>サインアップ＝profiles自動生成</b><br/>抜け漏れゼロ"]
-    Q ==> M2["✅ <b>退会＝profiles自動削除</b><br/>(on delete cascade)"]
+    Q ==> M2["✅ <b>退会＝profiles自動削除</b><br/>(外部キーのcascade)"]
     Q ==> M3["✅ <b>username / bio など<br/>自由にカラム追加</b>"]
     Q ==> M4["✅ <b>他テーブルからは<br/>profiles を参照</b>"]
 
@@ -446,26 +362,21 @@ flowchart TB
     style U2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-### Storage のコード例
-
-```ts
-// アップロード
-await supabase.storage
-  .from('avatars')
-  .upload(`${userId}/avatar.png`, file)
-
-// 公開URLを取得（public バケット）
-const { data } = supabase.storage
-  .from('avatars')
-  .getPublicUrl(`${userId}/avatar.png`)
-
-// 署名付きURL（private バケット, 60秒だけ有効）
-const { data } = await supabase.storage
-  .from('documents')
-  .createSignedUrl(`${userId}/secret.pdf`, 60)
-```
-
 > 📝 Storage も内部はPostgresのテーブルでメタデータを持っている。**バケット／オブジェクトに対してRLS的なポリシーが書ける**ので、「自分のアバターは自分しか上書きできない」みたいな制御が同じ発想でできる。
+
+### publicバケットとprivateバケットの使い分け
+
+```mermaid
+flowchart TB
+    Q["❓ ファイルをどう公開する？"] ==> A{"判断"}
+    A ==>|"誰でも見ていいもの<br/>(プロフ画像など)"| B1["🌐 <b>public バケット</b><br/>固定URLで配信"]
+    A ==>|"本人/権限者だけ<br/>(個人書類など)"| B2["🔑 <b>private バケット</b><br/>短時間有効な署名URL"]
+
+    style Q fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style A fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style B1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style B2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
 
 ---
 
@@ -487,24 +398,6 @@ sequenceDiagram
     Note over B: 画面に「Hi」が自動表示
 ```
 
-### Realtime のコード例
-
-```ts
-const channel = supabase
-  .channel('messages-channel')
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'messages' },
-    (payload) => {
-      console.log('新着:', payload.new)
-    }
-  )
-  .subscribe()
-
-// 解除
-await supabase.removeChannel(channel)
-```
-
 ```mermaid
 flowchart LR
     DB["🗄️ Postgres<br/>WAL（変更ログ）"] ==>|"監視"| RT["📡 Realtime サーバー"]
@@ -519,7 +412,7 @@ flowchart LR
     style C3 fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 仕組み的には Postgres の **論理レプリケーション（WAL）** を読んで配信している。テーブルごとに「Realtime対象にするか」を Dashboard で有効化して使う。
+> 📝 仕組み的にはPostgresの**論理レプリケーション（WAL）**を読んで配信している。テーブルごとに「Realtime対象にするか」をDashboardで有効化して使う。
 
 ---
 
@@ -538,26 +431,6 @@ flowchart LR
     style EF fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
     style DB fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
     style EXT fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-```
-
-### コード例（hello function）
-
-```ts
-// supabase/functions/hello/index.ts
-Deno.serve(async (req) => {
-  const { name } = await req.json()
-  return new Response(
-    JSON.stringify({ message: `Hello ${name}!` }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-})
-```
-
-```ts
-// フロントから呼ぶ
-const { data } = await supabase.functions.invoke('hello', {
-  body: { name: 'Taro' },
-})
 ```
 
 ### いつ Edge Functions を使う？
@@ -646,7 +519,7 @@ flowchart LR
     style R2A fill:#fff,color:#000,stroke:#C0392B,stroke-width:2px
 ```
 
-> 🚨 `service_role` を Git にcommitしてしまったら、**そのキーは即座に Supabase ダッシュボードで再発行**。漏れたキーは取り戻せない。[git.md](../git/git.md) §8の `.gitignore` の話とセットで覚える。
+> 🚨 `service_role` をGitにcommitしてしまったら、**そのキーは即座にSupabaseダッシュボードで再発行**。漏れたキーは取り戻せない。[git.md](../git/git.md) §8の `.gitignore` の話とセットで覚える。
 
 ---
 
