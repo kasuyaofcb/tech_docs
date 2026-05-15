@@ -305,6 +305,80 @@ flowchart LR
     style WD2 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
+> 📝 イメージは「**机の上の作業を、一旦引き出しにしまう**」感覚。あとで引き出しから取り出して続きを再開できる。
+
+### こんなときに使う（具体例）
+
+#### 例1: 作業中に緊急バグの修正依頼が来た
+
+`feature/login`で開発中、まだコミットできるキリのいい状態じゃない。でも本番でバグが見つかり、急いで`main`で修正したい、という王道シナリオ。
+
+```mermaid
+sequenceDiagram
+    participant U as 自分
+    participant F as feature/login
+    participant M as main
+    U->>F: 編集中...（未コミット）
+    Note over U,F: 🚨 緊急バグ報告！
+    U->>F: git stash push -m "ログイン画面 途中"
+    U->>M: git checkout main
+    U->>M: バグ修正 → add → commit → push
+    U->>F: git checkout feature/login
+    U->>F: git stash pop（作業再開）
+```
+
+> 💡 commitしてからブランチを移ることもできるが、**「中途半端な状態を履歴に残したくない」**ときにstashが便利。
+
+#### 例2: ブランチを間違えて作業していた
+
+`main`で作業を始めてしまい、コミット直前に「これ`feature`ブランチでやるやつだ…」と気づいたとき。
+
+```mermaid
+flowchart LR
+    S1["😱 main で<br/>編集してた"] ==> S2["<b>git stash</b><br/>変更を退避"]
+    S2 ==> S3["<b>git checkout -b feature/xxx</b><br/>正しいブランチを切る"]
+    S3 ==> S4["<b>git stash pop</b><br/>変更を呼び戻す"]
+    S4 ==> S5["✅ feature/xxx で<br/>add → commit"]
+
+    style S1 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S3 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S4 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+#### 例3: `git pull` したら「変更を確定してくれ」と怒られた
+
+リモートに新しいcommitが入っていて取り込みたいが、ローカルに未コミットの変更があるとpullが拒否されることがある。
+
+```mermaid
+flowchart LR
+    P1["<b>git pull</b><br/>❌ 失敗"] ==> P2["<b>git stash</b><br/>変更を一旦避ける"]
+    P2 ==> P3["<b>git pull</b><br/>✅ 取り込み成功"]
+    P3 ==> P4["<b>git stash pop</b><br/>変更を戻す"]
+
+    style P1 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style P3 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+#### 例4: 「この変更を一時的に外した状態」で挙動を確認したい
+
+書きかけのコードを残したまま、**変更前の状態でちゃんと動くか確認したい**ときも便利。
+
+```mermaid
+flowchart LR
+    E1["変更を加えてみた<br/>でも本当に必要？"] ==> E2["<b>git stash</b><br/>一旦外して<br/>変更前の状態に"]
+    E2 ==> E3["動作確認<br/>挙動を比較"]
+    E3 ==> E4["<b>git stash pop</b><br/>変更を戻す"]
+
+    style E1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style E2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style E3 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style E4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
 ### よく使うコマンド
 
 | コマンド | 説明 |
