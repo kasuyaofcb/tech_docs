@@ -17,6 +17,7 @@ flowchart TB
         ST["📁<br/><b>Storage</b><br/>ファイル保管"]
         RT["📡<br/><b>Realtime</b><br/>変更を即配信"]
         EF["⚡<br/><b>Edge Functions</b><br/>サーバー処理"]
+        DB ~~~ AUTH ~~~ ST ~~~ RT ~~~ EF
     end
 
     APP ==>|"SDK / REST / GraphQL"| SB
