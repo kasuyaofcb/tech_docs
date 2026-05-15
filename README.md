@@ -11,8 +11,9 @@
 | トピック | 内容 | 資料 |
 | --- | --- | --- |
 | Git | バージョン管理の全体像（作業ディレクトリ → ステージング → ローカル → リモート） | [git/git.md](git/git.md) |
+| Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [supabase/supabase.md](supabase/supabase.md) |
 
-> 今後追加予定: Supabase / Next.js / Docker / 認証まわり など
+> 今後追加予定: Next.js / Docker / 認証まわり など
 
 ---
 
