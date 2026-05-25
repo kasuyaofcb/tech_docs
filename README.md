@@ -12,6 +12,7 @@
 | --- | --- | --- |
 | Git | バージョン管理の全体像（作業ディレクトリ → ステージング → ローカル → リモート） | [git/git.md](git/git.md) |
 | Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [supabase/supabase.md](supabase/supabase.md) |
+| Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [vercel/vercel.md](vercel/vercel.md) |
 
 > 今後追加予定: Next.js / Docker / 認証まわり など
 

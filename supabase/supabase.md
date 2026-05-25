@@ -2,6 +2,12 @@
 
 > 📝 Supabase は「**バックエンドを丸ごと肩代わりしてくれるサービス**」。データベース・認証・ファイル保管・リアルタイム通信などを、サーバーを建てずに使えるようにする仕組み（BaaS = Backend as a Service）。中身は **PostgreSQL** という伝統的なDB。
 
+🧠 先に押さえておきたい3つの言葉:
+
+- **API**: プログラムから外部サービスを呼び出すための「窓口」。Supabaseの場合は「テーブルを読み書きするためのURL」と思えばOK。
+- **SDK**: そのAPIを**自分のアプリから呼びやすくするための部品集**（ライブラリ）。直接URLを叩く代わりに、`supabase.from('posts').select()` のように書ける。
+- **サーバーレス**: サーバーを常時起動せず、**呼ばれたときだけ瞬間起動する**処理の置き場。Edge Functionsの仕組み（後述§10）。
+
 ---
 
 ## 1. Supabaseが提供するもの
@@ -234,6 +240,8 @@ flowchart LR
 
 Supabase Authは、メール／パスワード、Google、GitHub、マジックリンクなど多様なログインを**最初から用意**してくれる。ログインしたユーザーは `auth.users` テーブルに自動で記録される。
 
+> 📝 **JWT（ジョット）** = ログイン成功時にユーザーに渡される「**電子的な身分証**」。ユーザーIDなどが詰まった文字列で、以降のリクエストに自動添付される。サーバー側はこれを見るだけで「誰からのアクセスか」判別できる（毎回パスワードを送らなくて済む）。
+
 ```mermaid
 flowchart LR
     U["👤 ユーザー"] ==>|"signUp / signIn"| A["🔐 Supabase Auth"]
@@ -421,6 +429,8 @@ flowchart LR
 
 「外部APIを叩く」「決済の確定処理」「Webhookを受ける」など、**フロントに置きたくないロジック**はEdge Functions（Deno製）で書ける。
 
+> 📝 **サーバーレス関数**（Edge Functions）の正体: サーバーを常時起動せず、**呼ばれた瞬間だけ立ち上がって処理して消える**仕組み。常駐コストがゼロ。Vercelの「Functions」も同じ発想（[vercel.md](../vercel/vercel.md) §9参照）。**Webhook** = 「何かが起きたら別サービスに自動で電話する」仕組み。Stripeの決済完了通知などをEdge Functionsで受け取れる。
+
 ```mermaid
 flowchart LR
     APP["📱 アプリ"] ==>|"functions.invoke('xxx')"| EF["⚡ Edge Function<br/>(Deno / TS)"]
@@ -521,6 +531,8 @@ flowchart LR
 ```
 
 > 🚨 `service_role` をGitにcommitしてしまったら、**そのキーは即座にSupabaseダッシュボードで再発行**。漏れたキーは取り戻せない。[git.md](../git/git.md) §8の `.gitignore` の話とセットで覚える。
+
+APIキーの正しい保管場所は **環境変数**（[git.md](../git/git.md) §8 / [vercel.md](../vercel/vercel.md) §7参照）。コードに直接書かず、`.env`ファイルやデプロイ先の管理画面に置き、コードからは名前で呼び出す。
 
 ---
 
