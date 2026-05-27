@@ -22,13 +22,13 @@ flowchart TB
     S2 ==> S3["③<br/>アプリのGit準備"]
 
     S3 ==> P2["🟡 <b>Part 2</b><br/>CI/CD構築<br/>(2択)"]
-    P2 --> A["🅰️ GitHub Actions版<br/>(個人〜小規模)"]
-    P2 --> B["🅱️ Azure Pipelines版<br/>(社内縛り)"]
+    P2 --> A["🅰️ GitHub Actions版<br/>(GitHub利用可能な環境)"]
+    P2 --> B["🅱️ Azure Pipelines版<br/>(自社リポジトリ前提の環境)"]
 
     A ==> P3["🟣 <b>Part 3</b><br/>DB選択<br/>(3択)"]
     B ==> P3
-    P3 --> X["Ⓧ Supabase併用<br/>(最速)"]
-    P3 --> Y["Ⓨ Azure SQL Database<br/>(エンプラ)"]
+    P3 --> X["Ⓧ Supabase併用<br/>(BaaS型)"]
+    P3 --> Y["Ⓨ Azure SQL Database<br/>(業務利用向け)"]
     P3 --> Z["Ⓩ Azure PostgreSQL<br/>(OSS互換)"]
 
     X ==> P4["🟢 <b>Part 4</b><br/>つなぎ込み + デプロイ確認"]
@@ -56,7 +56,7 @@ flowchart TB
 | 3 | DB準備 (Supabase / Azure SQL / PostgreSQL) | 15〜30分 |
 | 4 | つなぎ込み + デプロイ確認 | 15分 |
 
-> 📝 **おすすめの初手**: 「Part 1 → 2-A (GH Actions) → 3-X (Supabase) → Part 4」が最短で公開まで行ける。エンプラ要件が出てきたら 2-B / 3-Y に置き換える。
+> 📝 **構成例の一つ**: 「Part 1 → 2-A (GH Actions) → 3-X (Supabase) → Part 4」が短時間で公開まで進められる経路。業務利用での要件（閉域 / 監査 など）が必要になれば 2-B / 3-Y に置き換える。
 
 ---
 
@@ -163,8 +163,8 @@ GitHub Actions版 (2-A) と Azure Pipelines版 (2-B) のどちらかを選ぶ。
 flowchart TB
     Q["🤔 どっち？"] ==> Q1{"環境の制約"}
 
-    Q1 -->|"GitHub使える<br/>(個人/小規模)"| A["🅰️ <b>GitHub Actions版</b><br/>(2-A)<br/>所要15分"]
-    Q1 -->|"社内縛り<br/>GitHub使えない"| B["🅱️ <b>Azure Pipelines版</b><br/>(2-B)<br/>所要30分"]
+    Q1 -->|"GitHub利用可"| A["🅰️ <b>GitHub Actions版</b><br/>(2-A)<br/>所要15分"]
+    Q1 -->|"GitHubを使わない<br/>(自社リポジトリ等)"| B["🅱️ <b>Azure Pipelines版</b><br/>(2-B)<br/>所要30分"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
@@ -174,9 +174,9 @@ flowchart TB
 
 ---
 
-## 2-A. GitHub Actions版 (個人開発〜小規模)
+## 2-A. GitHub Actions版 (GitHubが利用可能な環境)
 
-Azure SWA を作る際に GitHub 連携を指定すれば、Azure が**勝手にワークフローファイルを commit** してくれる。実質「Portal で数項目埋めるだけ」。
+Azure SWA を作る際に GitHub 連携を指定すれば、Azure が**ワークフローファイルを自動で commit** する。「Portal で数項目埋めるだけ」で初期構成が完了する形。
 
 ```mermaid
 flowchart LR
@@ -245,9 +245,9 @@ flowchart LR
 
 ---
 
-## 2-B. Azure Pipelines版 (社内縛り向け)
+## 2-B. Azure Pipelines版 (Azure内で完結させる場合)
 
-GitHub が使えない / Azure 内で完結させたい場合の手順。**Azure DevOps 組織の作成 → Azure Repos にコード移送 → Pipelines 構築**の3段階。
+GitHub を使わない / Azure 内でリポジトリと CI/CD を完結させる場合の手順。**Azure DevOps 組織の作成 → Azure Repos にコード移送 → Pipelines 構築**の3段階。
 
 ```mermaid
 flowchart LR
@@ -342,8 +342,8 @@ flowchart LR
 flowchart TB
     Q["🤔 どのDB？"] ==> Q1{"優先したいもの"}
 
-    Q1 -->|"最速で公開<br/>認証+RLS込み"| X["Ⓧ <b>Supabase併用</b><br/>(3-X)<br/>所要15分"]
-    Q1 -->|"エンプラ整合性<br/>MS純正"| Y["Ⓨ <b>Azure SQL Database</b><br/>(3-Y)<br/>所要20分"]
+    Q1 -->|"BaaS型で<br/>認証+RLS込み"| X["Ⓧ <b>Supabase併用</b><br/>(3-X)<br/>所要15分"]
+    Q1 -->|"Microsoft製品<br/>との統合"| Y["Ⓨ <b>Azure SQL Database</b><br/>(3-Y)<br/>所要20分"]
     Q1 -->|"OSS Postgres<br/>移行性重視"| Z["Ⓩ <b>Azure PostgreSQL</b><br/>(3-Z)<br/>所要20分"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
@@ -355,9 +355,9 @@ flowchart TB
 
 ---
 
-## 3-X. Supabase 併用 (最速ルート)
+## 3-X. Supabase 併用 (BaaS型)
 
-DB + 認証 + Realtime + RLS が一式揃った BaaS。Azure 側に DB を作らずに済む。**個人開発で最も速い**。
+DB + 認証 + Realtime + RLS が一式揃った BaaS。Azure 側に DB を作らずに済むため、**初期セットアップが少ない構成**。
 
 ```mermaid
 flowchart LR
@@ -388,16 +388,16 @@ flowchart LR
 
 ---
 
-## 3-Y. Azure SQL Database (エンプラ本命)
+## 3-Y. Azure SQL Database (業務利用向け)
 
-Microsoft 純正の RDB。SQL Server 系で、エンプラ環境との整合性が高い。
+Microsoft 製の RDB。SQL Server 系で、他の Microsoft 製品との統合性が高い。
 
 ```mermaid
 flowchart LR
     S1["①<br/>Portalで<br/>'SQL databases'検索"] ==> S2["②<br/>+ 作成"]
     S2 ==> S3["③<br/>サーバー新規作成<br/>(なければ)"]
     S3 ==> S4["④<br/>認証方法選択<br/>(SQL or Entra)"]
-    S4 ==> S5["⑤<br/>サイズ: Basic<br/>(個人開発)"]
+    S4 ==> S5["⑤<br/>サイズ: Basic<br/>(小規模利用)"]
     S5 ==> S6["⑥<br/>ファイアウォール<br/>'Azureサービスを許可'"]
     S6 ==> S7["✅<br/>接続文字列<br/>コピー"]
 
@@ -417,9 +417,9 @@ flowchart LR
 | リソースグループ | `rg-my-app` |
 | データベース名 | `db-my-app` |
 | サーバー | 新規作成 → 名前 / 場所 / 管理者ログイン+パスワード |
-| 認証方法 | SQL認証 (個人開発) / Entra ID (エンプラ) |
+| 認証方法 | SQL認証 (簡易) / Entra ID 統合 (組織アカウント連携) |
 | 価格レベル | **Basic** ($5/月程度) または **無料サービス** (12ヶ月) |
-| バックアップ冗長性 | ローカル冗長 (個人開発) |
+| バックアップ冗長性 | ローカル冗長 (検証/小規模) |
 
 **接続文字列の取得:**
 
@@ -429,13 +429,13 @@ flowchart LR
 
 > 🚨 **ファイアウォール設定が必須**: 作成直後はインターネットから繋がらない。サーバーリソース → ネットワーク → 「Azure サービスとリソースにこのサーバーへのアクセスを許可する」 を **オン** にする。これで同じAzure内のSWA / Functionsから接続できる。
 
-> 🚨 **接続文字列に管理者パスワードを直書きしない**: Part 4 で **Key Vault** に保管するのが本筋。
+> 🚨 **接続文字列に管理者パスワードを直書きしない**: Part 4 で **Key Vault** に保管する形が望ましい。
 
 ---
 
 ## 3-Z. Azure Database for PostgreSQL (OSS互換)
 
-OSS Postgres そのもの。**Supabaseから移行しやすい**のが強み（SQL方言が同じ）。
+OSS Postgres そのもの。Supabase など他の Postgres ベースの DB から移行しやすい（SQL方言が同じ）。
 
 ```mermaid
 flowchart LR
@@ -463,13 +463,13 @@ flowchart LR
 | サーバー名 | `pg-my-app` |
 | デプロイの種類 | **Flexible server** (推奨) |
 | バージョン | 16 (新しい安定版) |
-| サイズ | Burstable B1ms (個人開発の最小) |
+| サイズ | Burstable B1ms (最小プラン・検証/小規模向け) |
 | 認証方法 | PostgreSQL 認証のみ / Entra ID 併用 |
 | 管理者ユーザー / パスワード | 自分で決める |
 
 > 📝 **「Single Server」は選ばない**: 旧世代で廃止予定。必ず **Flexible Server** を選ぶ。
 
-> 📝 **Supabase からの移行**: Supabase の Dashboard → Database → Backups から dump を取り、Azure PostgreSQL に `pg_restore` で投入できる。スキーマはそのまま使える（RLSポリシーも標準Postgresの機能なので移植可能）。
+> 📝 **Supabase からの移行**: Supabase の Dashboard → Database → Backups から dump を取り、Azure PostgreSQL に `pg_restore` で投入できる。スキーマはそのまま利用可能（RLSポリシーは標準Postgresの機能なので移植可能）。
 
 ---
 
@@ -615,7 +615,7 @@ flowchart TB
     Q -->|"URL開いたら404"| A3["📍 SWA → 構成 →<br/>出力先設定"]
     Q -->|"DB繋がらない"| A4["📍 ファイアウォール<br/>+ 接続文字列"]
     Q -->|"環境変数効かない"| A5["📍 ビルド時=Secrets<br/>実行時=Configuration"]
-    Q -->|"課金が怖い"| A6["📍 コスト管理 →<br/>予算アラート設定"]
+    Q -->|"課金状況を見たい"| A6["📍 コスト管理 →<br/>予算アラート設定"]
 
     style P fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q fill:#F4C430,color:#000,stroke:#333,stroke-width:3px

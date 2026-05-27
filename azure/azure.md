@@ -9,7 +9,7 @@
 - **クラウド**: 自分のPCやサーバーではなく、**よその会社のデータセンター**を借りて動かす仕組み。Azure / AWS / Google Cloud の3社が代表。
 - **PaaS / IaaS / SaaS**: クラウドの使い方の段階。**IaaS**=サーバーだけ借りる（OSは自分で） / **PaaS**=実行環境ごと借りる（コード置くだけ） / **SaaS**=完成品を使う。
 - **リージョン**: データセンターの場所。「東日本リージョン」「米国東部」など世界中にある。近いほど速い。
-- **テナント / サブスクリプション**: Azure特有の階層（後述§3）。最初に必ずつまずく場所。
+- **テナント / サブスクリプション**: Azure特有の階層（後述§3）。最初の利用時に理解しておく必要がある概念。
 
 ---
 
@@ -65,7 +65,7 @@ flowchart TB
 
     subgraph RIGHT["⭕ 実際"]
         direction LR
-        R1["Static Web Apps は"] ==> R2["<b>無料枠で商用OK</b><br/>(Vercel Hobbyは商用NG)"] ==> R3["個人開発〜中規模に最適"]
+        R1["Static Web Apps は"] ==> R2["<b>無料枠で商用利用可</b>"] ==> R3["小規模〜中規模利用に対応"]
     end
 
     style WRONG fill:#FFE5E5,stroke:#C0392B,stroke-width:2px,color:#000
@@ -123,7 +123,7 @@ flowchart TB
 
 ## 3. Azure特有の階層 — テナント / サブスクリプション / リソースグループ / リソース
 
-Azureを使う上で**最初に必ずつまずく**のがこの4階層。Vercel や Supabase にはない独特の概念で、ここを理解すると一気にスッキリする。
+Azureの利用開始時に把握する必要があるのがこの4階層。Vercel や Supabase にはない独特の概念で、ここを理解すると全体像が捉えやすくなる。
 
 ```mermaid
 flowchart TB
@@ -165,7 +165,7 @@ flowchart LR
     style E fill:#C0392B,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-ブラウザに古い Microsoft セッションが残っていると、勝手に**別組織のテナント**を見に行ってエラーになる。`portal.azure.com` 右上のディレクトリ表示が「Default Directory」になっていることを必ず確認する。直らない時は **別ブラウザ or シークレットウィンドウ**で `azure.microsoft.com/free` から入り直すのが確実。
+ブラウザに古い Microsoft セッションが残っていると、自動的に**別組織のテナント**を参照してエラーになる。`portal.azure.com` 右上のディレクトリ表示が「Default Directory」になっていることを必ず確認する。改善しない場合は **別ブラウザまたはシークレットウィンドウ**で `azure.microsoft.com/free` から入り直す。
 
 ---
 
@@ -195,7 +195,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    A["🆓 無料試用版"] ==>|"そのまま"| B["✅ 上限超過時は<br/><b>自動停止</b><br/>勝手な課金なし"]
+    A["🆓 無料試用版"] ==>|"そのまま"| B["✅ 上限超過時は<br/><b>自動停止</b><br/>意図しない課金は発生しない"]
     A ==>|"❌ ボタン押下"| C["⚠️ <b>Pay-As-You-Go</b><br/>従量課金モード<br/>上限なし"]
 
     style A fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -203,7 +203,7 @@ flowchart TB
     style C fill:#C0392B,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
-無料試用版のままなら**枠を超えるとリソースが停止**するだけだが、Pay-As-You-Go に切り替えると**青天井で課金**される。Portal の各所に勧誘ボタンが出るが、個人開発・お試し段階では押さない。
+無料試用版のままなら**枠を超えるとリソースが停止**するだけだが、Pay-As-You-Go に切り替えると**上限なく課金**される。Portal の各所に切替を促すボタンが表示されるが、検証や小規模利用の段階では押さない。
 
 ---
 
@@ -215,12 +215,12 @@ Azureには「アプリを動かす場所」が複数ある。**個人開発→�
 flowchart TB
     Q["📱 アプリを<br/>置きたい"] ==> Q1{"どんな<br/>アプリ？"}
 
-    Q1 -->|"フロントエンドメイン<br/>(SPA / Jamstack)"| SWA["🟢 <b>Static Web Apps</b><br/>個人〜中規模の本命<br/>無料 / GitHub連携"]
-    Q1 -->|"普通のWebアプリ<br/>(SSR / API)"| APP["🔵 <b>App Service</b><br/>老舗のPaaS<br/>Slot機能が強力"]
-    Q1 -->|"コンテナで<br/>動かしたい"| CA["🟣 <b>Container Apps</b><br/>Docker / KEDA<br/>マイクロサービス向き"]
+    Q1 -->|"フロントエンドメイン<br/>(SPA / Jamstack)"| SWA["🟢 <b>Static Web Apps</b><br/>静的サイト + API<br/>無料 / GitHub連携"]
+    Q1 -->|"一般的なWebアプリ<br/>(SSR / API)"| APP["🔵 <b>App Service</b><br/>汎用PaaS<br/>Slot機能あり"]
+    Q1 -->|"コンテナで<br/>動かしたい"| CA["🟣 <b>Container Apps</b><br/>Docker / KEDA<br/>マイクロサービス向け"]
     Q1 -->|"イベント駆動<br/>関数だけ"| FN["🟡 <b>Functions</b><br/>サーバーレス<br/>定期実行 / Webhook"]
-    Q1 -->|"OSごと自分で<br/>使いたい"| VM["⚫ <b>Virtual Machines</b><br/>IaaS / 最重<br/>レガシー移行用"]
-    Q1 -->|"本気のk8s"| AKS["🟠 <b>AKS</b><br/>Kubernetes<br/>大規模本格運用"]
+    Q1 -->|"OSごと自分で<br/>使いたい"| VM["⚫ <b>Virtual Machines</b><br/>IaaS<br/>既存システム移行用"]
+    Q1 -->|"本格的なk8s"| AKS["🟠 <b>AKS</b><br/>Kubernetes<br/>大規模運用"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
@@ -232,16 +232,16 @@ flowchart TB
     style AKS fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-| サービス | 何向け | 料金感 | 個人開発 | 本格運用 |
+| サービス | 用途 | 料金感 | 小規模 | 大規模 |
 | ---- | ---- | ---- | :---: | :---: |
-| **Static Web Apps** | 静的サイト + API（Functions同梱） | 無料枠あり | ⭐⭐⭐ | ⭐⭐ |
-| **App Service** | 一般的なWebアプリ（Node/.NET/Python） | $13/月〜 | ⭐⭐ | ⭐⭐⭐ |
-| **Container Apps** | コンテナ型・マイクロサービス | 従量 | ⭐ | ⭐⭐⭐ |
-| **Functions** | 単発処理・Webhook・定期実行 | 100万回/月無料 | ⭐⭐⭐ | ⭐⭐ |
-| **VM** | 自由度最大・レガシー移行 | $7/月〜 | △ | ⭐⭐ |
-| **AKS** | 本格的なKubernetes | 高い | × | ⭐⭐⭐ |
+| **Static Web Apps** | 静的サイト + API（Functions同梱） | 無料枠あり | ◯ | △ |
+| **App Service** | 汎用Webアプリ（Node/.NET/Python） | $13/月〜 | △ | ◯ |
+| **Container Apps** | コンテナ型・マイクロサービス | 従量 | △ | ◯ |
+| **Functions** | 単発処理・Webhook・定期実行 | 100万回/月無料 | ◯ | △ |
+| **VM** | OSレベルから自由に構成 | $7/月〜 | △ | △ |
+| **AKS** | Kubernetesクラスター運用 | 高い | × | ◯ |
 
-> 📝 まず **Static Web Apps から始め**、SSR や複雑なAPIが必要になったら **App Service** へ。本格的にコンテナ運用になったら **Container Apps** に進む、というのが定番の階段。
+> 📝 構成パターンの一例として、Static Web Apps から始め、SSR や複雑なAPIが必要になれば App Service、コンテナ運用に移行する場合は Container Apps を選ぶ、という段階的な切替が考えられる。
 
 ---
 
@@ -298,7 +298,7 @@ flowchart LR
     style S6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 作成時にAzureが**GitHub Actions のワークフローファイル**（`.github/workflows/azure-static-web-apps-xxxx.yml`）を**勝手にリポジトリへ commit** する。これが「git push したら自動デプロイ」の正体。Vercel が裏で持っている Webhook の代わりに、Azureは GitHub Actions に乗っかる方式。
+> 📝 作成時にAzureが**GitHub Actions のワークフローファイル**（`.github/workflows/azure-static-web-apps-xxxx.yml`）を**自動でリポジトリへ commit** する。これが「git push したら自動デプロイ」が動作する仕組み。Vercel が内部で持っている Webhook と異なり、Azure は GitHub Actions を経由する方式。
 
 ### 💸 Static Web Apps 無料枠の主な制限
 
@@ -310,9 +310,9 @@ flowchart LR
 | SSL証明書 | 自動・無料 | — |
 | Staging環境 | PR毎に自動発行 | — |
 | API実行(Functions同梱) | 無料枠内 | — |
-| **商用利用** | ✅ **OK** | （Vercel Hobby より緩い） |
+| **商用利用** | ✅ **可** | — |
 
-> 🚨 個人開発・社内ツール・小規模商用ならFree tierで十分。**Vercel Hobby と違い商用OK**なので、副業や小規模スタートアップにとっては実はAzureの方が条件が良い。
+> 📝 Free tier で商用利用が可能なため、小規模なサービスや社内ツールでも追加課金なく運用できる。
 
 ---
 
@@ -324,7 +324,7 @@ Static Web Apps はあくまでフロント+軽量APIなので、データ保存
 flowchart TB
     Q["🗄️ データを<br/>保存したい"] ==> Q1{"DBの種類"}
 
-    Q1 -->|"伝統的RDB"| AS["🔵 <b>Azure SQL<br/>Database</b><br/>SQL Server系<br/>エンプラの本命"]
+    Q1 -->|"伝統的RDB"| AS["🔵 <b>Azure SQL<br/>Database</b><br/>SQL Server系<br/>業務システムで一般的"]
     Q1 -->|"OSS Postgres"| PG["🟢 <b>Azure Database<br/>for PostgreSQL</b><br/>標準Postgres"]
     Q1 -->|"NoSQL / 多モデル"| CD["🟣 <b>Cosmos DB</b><br/>グローバル分散<br/>サーバーレス課金"]
     Q1 -->|"BaaS全部入り<br/>(認証+RT+RLS)"| SB["🟢 <b>Supabase</b><br/>(Azure外)<br/>(参考: <a href='../supabase/supabase.md'>supabase.md</a>)"]
@@ -339,15 +339,15 @@ flowchart TB
     style RD fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-| サービス | 強み | 個人開発 | 本格運用 |
+| サービス | 特徴 | 小規模 | 大規模 |
 | ---- | ---- | :---: | :---: |
-| **Azure SQL Database** | エンプラ標準・MS整合性・最も無難 | △（高め） | ⭐⭐⭐ |
-| **PostgreSQL (Flexible Server)** | OSS互換・移行性高 | ⭐⭐ | ⭐⭐⭐ |
-| **Cosmos DB** | グローバル分散・無料枠1000RU/s | ⭐⭐ | ⭐⭐⭐ |
-| **Supabase併用** | 認証+RLS+Realtime込み・手早い | ⭐⭐⭐ | ⭐⭐ |
-| **Cache for Redis** | セッション/キャッシュ用の脇役 | △ | ⭐⭐ |
+| **Azure SQL Database** | Microsoft 製品との統合、業務システムで一般的 | △（料金高め） | ◯ |
+| **PostgreSQL (Flexible Server)** | OSS互換・移行性が高い | ◯ | ◯ |
+| **Cosmos DB** | グローバル分散・無料枠 1000 RU/s | ◯ | ◯ |
+| **Supabase併用** | 認証+RLS+Realtime 一式同梱 | ◯ | △ |
+| **Cache for Redis** | セッション/キャッシュ用途 | △ | ◯ |
 
-> 📝 個人開発の初手なら **Supabase + Azure Static Web Apps** の組み合わせが軽くて速い（実際の構成例: フロントを SWA、DB+認証は Supabase）。社内縛りで「Azure内で完結」が必要なら **Azure SQL or PostgreSQL** に切り替える。詳しいDBの概念は [supabase.md](../supabase/supabase.md) §4-5 を参照。
+> 📝 構成パターンの一例として、Supabase + Azure Static Web Apps は外部 DB と組み合わせる構成、Azure 内で完結させる場合は Azure SQL Database や PostgreSQL が選択肢になる。DB の基本概念は [supabase.md](../supabase/supabase.md) §4-5 を参照。
 
 ---
 
@@ -398,7 +398,7 @@ flowchart TB
     style R3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 **Slot Swap** は実は Vercel より前から Azure（App Service）に存在する**老舗の仕組み**。「新バージョンを Staging スロットに置いて疎通試験 → swap ボタンで本番と入れ替え」を**ゼロダウンタイム**で実現する。エンプラ受けが良い理由のひとつ。
+> 📝 **Slot Swap** は Azure（App Service）が以前から備える仕組み。「新バージョンを Staging スロットに置いて疎通試験 → swap ボタンで本番と入れ替え」を**ゼロダウンタイム**で実現する。本番環境での切替リスクを抑えたい場合の代表的な選択肢。
 
 ---
 
@@ -443,7 +443,7 @@ flowchart LR
 
 ## 10. 環境変数とシークレット — 置き場所が3つある
 
-ここがVercelより**ややこしい**ポイント。Azureでは「**いつ使うか**」で置き場所が変わる。
+Azureでは「**いつ使うか**」で置き場所が変わる。Vercelの単一の環境変数機能と比較すると、選択肢が複数ある。
 
 ```mermaid
 flowchart TB
@@ -484,13 +484,13 @@ flowchart LR
     style RBAC fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-エンプラ要件で「誰がいつシークレットを参照したか監査したい」「**人間にはキーを見せない**（Managed Identity 経由で取得）」が必要になったら Key Vault。個人開発段階では SWA Configuration で十分。
+業務要件で「誰がいつシークレットを参照したか監査したい」「**人間にはキーを見せない**（Managed Identity 経由で取得）」が必要になった場合に Key Vault を使う。小規模利用であれば SWA Configuration で完結する。
 
 ---
 
-## 11. GitHub以外からのCI/CD — 社内縛り対策
+## 11. GitHub以外からのCI/CD
 
-Azure SWA は GitHub 連携が基本だが、**GitHub が使えない環境**（社内ネットワーク・コンプライアンス制約など）でも以下の選択肢がある。
+Azure SWA は GitHub 連携が基本だが、**GitHub を使わない環境**（自社ホスティングのGit利用、閉域ネットワーク要件、コンプライアンス制約など）でも以下の選択肢がある。
 
 ```mermaid
 flowchart TB
@@ -509,16 +509,16 @@ flowchart TB
     style P4 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-| 選択肢 | 特徴 | 社内環境で響く点 |
+| 選択肢 | 特徴 | 業務利用での利点 |
 | --- | --- | --- |
-| **Azure DevOps Pipelines** | MS純正・SWAタスク標準提供 | AAD連携◎ / セルフホストAgent / Azure Monitor統合 |
+| **Azure DevOps Pipelines** | Microsoft 製・SWAタスク標準提供 | Entra ID連携 / セルフホストAgent対応 / Azure Monitor統合 |
 | **SWA CLI + deployment token** | 任意のCIから `swa deploy` | GitLab/Jenkins/CircleCI等 |
 | **GitLab/Bitbucket** | SWA作成時は「No Source」で作り、上記CLI経由 | — |
-| **手動デプロイ** | ローカルから同じCLI | お試し/緊急用 |
+| **手動デプロイ** | ローカルから同じCLI | 検証/緊急対応 |
 
 ### 11.1 Azure DevOps の中身 — Pipelines は5部品の1つ
 
-「Azure DevOps」は単一サービスではなく、**5つのサービスをまとめたスイート**（`dev.azure.com` 配下）。CI/CD 文脈で主役なのは Pipelines だが、社内縛り環境では **Repos も合わせて選ぶ**ことが多い（=「GitHub と GitHub Actions を Azure 内で両方代替」）。
+「Azure DevOps」は単一サービスではなく、**5つのサービスをまとめたスイート**（`dev.azure.com` 配下）。CI/CD 文脈で主に使うのは Pipelines だが、Git ホスティングも Azure 内で完結させる場合は **Repos も合わせて使う**ことがある（=「GitHub と GitHub Actions を両方とも Azure 内で代替する」構成）。
 
 ```mermaid
 flowchart TB
@@ -538,15 +538,15 @@ flowchart TB
     style P5 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-| サービス | GitHub対応物 | 個人開発 | エンプラ |
+| サービス | GitHub対応物 | 小規模 | 業務利用 |
 | --- | --- | :---: | :---: |
-| **Pipelines** | GitHub Actions | ⭐⭐ | ⭐⭐⭐ |
-| **Repos** | GitHub本体 | △ | ⭐⭐⭐ |
-| **Boards** | GitHub Issues / Projects | △ | ⭐⭐⭐ |
-| **Artifacts** | GitHub Packages | △ | ⭐⭐ |
-| **Test Plans** | （独自・GitHubにない） | × | ⭐⭐ |
+| **Pipelines** | GitHub Actions | ◯ | ◯ |
+| **Repos** | GitHub本体 | △ | ◯ |
+| **Boards** | GitHub Issues / Projects | △ | ◯ |
+| **Artifacts** | GitHub Packages | △ | ◯ |
+| **Test Plans** | （独自・GitHubにない） | × | ◯ |
 
-> 📝 「GitHubを丸ごとAzure側で代替」したいなら **Repos + Pipelines** をセットで使う。両方とも **Entra ID (AAD)** で社員アカウント連携でき、Microsoft 365 と権限管理を一元化できる。
+> 📝 GitHub の機能を Azure 側で代替する場合は **Repos + Pipelines** をセットで使う。両方とも **Entra ID** で組織アカウント連携でき、Microsoft 365 と権限管理を一元化できる。
 
 ### 11.2 GitHub Actions ⇄ Azure Pipelines マッピング
 
@@ -607,20 +607,20 @@ flowchart LR
 
 > 📝 SWA 専用タスク **`AzureStaticWebApp@0`** が Microsoft 公式に用意されているので、GH Actions の `Azure/static-web-apps-deploy@v1` と1対1で置き換えられる。NEXT_PUBLIC_* 系のビルド時埋め込み（§10）も `env:` で渡せばよく、考え方は同じ。
 
-### 11.3 エンプラで響く3つの理由 — 閉域 / AAD / 監査
+### 11.3 業務利用で重要な3つの観点 — 閉域 / Entra ID / 監査
 
-社内でGitHubが使いにくい状況の本質は「**外部にコード/資格情報を出したくない**」「**社員アカウントで一元管理したい**」「**監査ログがほしい**」の3点。Azure DevOps Pipelines はここに**標準対応**する。
+GitHub が組織で使いにくい状況の主な要因は「**外部にコード/資格情報を出さない**」「**組織アカウントで一元管理する**」「**監査ログを残す**」の3点。Azure DevOps Pipelines は**いずれも標準で対応**している。
 
 ```mermaid
 flowchart TB
-    R["🏢 エンプラ要件"] --> R1{"必要なもの"}
+    R["🏢 業務利用での要件"] --> R1{"必要なもの"}
 
-    R1 --> N1["🛡️ <b>閉域ネットワーク</b><br/>ビルドマシンを<br/>社内に置きたい"]
-    R1 --> N2["🛂 <b>SSO / ID統合</b><br/>社員アカウントで<br/>そのまま使う"]
+    R1 --> N1["🛡️ <b>閉域ネットワーク</b><br/>ビルドマシンを<br/>組織内に置く"]
+    R1 --> N2["🛂 <b>SSO / ID統合</b><br/>組織アカウントで<br/>そのまま使う"]
     R1 --> N3["📜 <b>監査</b><br/>誰がいつ何をしたか<br/>記録/出力"]
 
-    N1 --> S1["✅ <b>Self-hosted Agent</b><br/>社内サーバー/VMに<br/>エージェント常駐"]
-    N2 --> S2["✅ <b>Entra ID (AAD)</b><br/>連携<br/>Service Principal<br/>でAzure操作"]
+    N1 --> S1["✅ <b>Self-hosted Agent</b><br/>組織内サーバー/VMに<br/>エージェント常駐"]
+    N2 --> S2["✅ <b>Entra ID</b><br/>連携<br/>Service Principal<br/>でAzure操作"]
     N3 --> S3["✅ <b>Azure Monitor</b><br/>連携<br/>監査ログ集約"]
 
     style R fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
@@ -633,7 +633,7 @@ flowchart TB
     style S3 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-#### Self-hosted Agent — 閉域ネットワークの肝
+#### Self-hosted Agent — 閉域ネットワーク対応
 
 ```mermaid
 flowchart LR
@@ -641,9 +641,9 @@ flowchart LR
         MH["🟦 Microsoft<br/>データセンター<br/>のVM"]
     end
 
-    subgraph INTRA["🏢 社内ネットワーク (閉域)"]
-        SH["🟩 <b>Self-hosted</b><br/><b>Agent</b><br/>社内サーバー"]
-        SC["🗄️ 社内Git/<br/>社内DB/<br/>社内API"]
+    subgraph INTRA["🏢 組織内ネットワーク (閉域)"]
+        SH["🟩 <b>Self-hosted</b><br/><b>Agent</b><br/>組織内サーバー"]
+        SC["🗄️ 組織内Git/<br/>組織内DB/<br/>組織内API"]
         SH ---|"閉域内で完結"| SC
     end
 
@@ -660,19 +660,19 @@ flowchart LR
 
 | 項目 | Microsoft-hosted | Self-hosted |
 | --- | --- | --- |
-| 動く場所 | Microsoft のクラウド | 社内サーバー / VM |
+| 動く場所 | Microsoft のクラウド | 組織内サーバー / VM |
 | インターネット必須 | ✅ 必要 | ❌ アウトバウンドのみで可 |
 | 無料枠 | 1,800分/月（Private） | 自前マシン |
-| 社内DB/社内APIアクセス | ❌ 不可（外から見えない） | ✅ 可 |
-| 構築の手間 | ゼロ | エージェントインストール必要 |
+| 組織内DB/組織内APIアクセス | ❌ 不可（外から見えない） | ✅ 可 |
+| 構築の手間 | ゼロ | エージェントインストールが必要 |
 
-> 📝 Agent は**アウトバウンドの長時間ポーリング**で Pipelines クラウドから「次のジョブ」を取りに行く方式。**社内ファイアウォール越しでも疎通可能**で、社内側でポートを開ける必要がない。これが「閉域でも回せる」最大の理由。
+> 📝 Agent は**アウトバウンドの長時間ポーリング**で Pipelines クラウドから「次のジョブ」を取りに行く方式。**組織のファイアウォール越しでも疎通可能**で、組織側でポートを開ける必要がない。これが閉域ネットワーク内でも動作する仕組み。
 
-#### AAD連携 + Service Principal — 人ではなくロボットIDで認証
+#### Entra ID連携 + Service Principal — 人ではなくロボットIDで認証
 
 ```mermaid
 flowchart LR
-    DEV["👤 社員<br/>(Entra ID)"] ==>|"SSO"| ADO["🟦 Azure DevOps"]
+    DEV["👤 利用者<br/>(Entra ID)"] ==>|"SSO"| ADO["🟦 Azure DevOps"]
     ADO ==>|"Service Connection"| SP["🤖 <b>Service Principal</b><br/>(ロボット ID)"]
     SP ==>|"RBAC で必要権限のみ"| AR["🔷 Azureリソース<br/>(SWA / Key Vault等)"]
 
@@ -682,17 +682,17 @@ flowchart LR
     style AR fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 **Service Principal** = Pipelines が Azure リソースを操作するための**専用ロボットアカウント**。「人間のパスワードをパイプラインに埋め込む」のではなく、ロボットIDに最小権限だけ与える。退職者対応・権限剥奪が AAD で一元化できるのがエンプラで効く。
+> 📝 **Service Principal** = Pipelines が Azure リソースを操作するための**専用ロボットアカウント**。「人間のパスワードをパイプラインに埋め込む」のではなく、ロボットIDに最小権限だけ与える。退職者対応・権限剥奪が Entra ID で一元化できるため、組織利用での運用に適している。
 
-### 11.4 エンプラ移行の現実的なレシピ
+### 11.4 業務利用への段階的な移行手順
 
 ```mermaid
 flowchart LR
-    Step1["① GitHub Actions で<br/>動く構成を作る<br/>(個人開発)"] ==> Step2["② Azure Repos に<br/>コードを移送"]
+    Step1["① GitHub Actions で<br/>動く構成を作る<br/>(小規模/検証)"] ==> Step2["② Azure Repos に<br/>コードを移送"]
     Step2 ==> Step3["③ workflow.yml を<br/>azure-pipelines.yml に翻訳<br/>(§11.2 マッピング)"]
-    Step3 ==> Step4["④ Self-hosted Agent<br/>を社内に立てる"]
+    Step3 ==> Step4["④ Self-hosted Agent<br/>を組織内に立てる"]
     Step4 ==> Step5["⑤ Service Connection<br/>(Service Principal)<br/>でAzure接続"]
-    Step5 ==> Step6["✅ 閉域 + AAD +<br/>監査 全部満たす"]
+    Step5 ==> Step6["✅ 閉域 + Entra ID +<br/>監査 を満たす構成"]
 
     style Step1 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
     style Step2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -702,7 +702,7 @@ flowchart LR
     style Step6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
-> 📝 個人開発段階で GitHub Actions に慣れておけば、エンプラ段階でも **「同じYAMLを翻訳するだけ」** に持ち込める。最初から Pipelines で組む必要はなく、**①〜⑤を順番に置き換える**のが現実的。
+> 📝 GitHub Actions で構成を作っておくと、業務利用環境でも **「YAMLを翻訳するだけ」** で移行できる。最初から Pipelines で組む必要はなく、**①〜⑤を順番に置き換える**形が一つのパターン。
 
 ---
 
@@ -755,7 +755,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    P["💰 課金が怖い"] ==> B["📊 <b>コスト管理 + 課金</b><br/>(Cost Management)"]
+    P["💰 課金状況を見たい"] ==> B["📊 <b>コスト管理 + 課金</b><br/>(Cost Management)"]
     B ==> B1["📈 予測コスト確認"]
     B ==> B2["🔔 <b>予算アラート</b>設定<br/>(例: $5超で通知)"]
     B ==> B3["🔍 リソース別内訳"]
@@ -823,15 +823,15 @@ flowchart TB
 
 ---
 
-## 14. 個人開発 → 本格運用への階段
+## 14. 規模に応じた構成の段階
 
-「最初は Free tier、でもいずれ本番に育てたい」という流れで、**増やしていくサービス**と**置き換えていく構成**を一望する。
+「最初は Free tier、その後本番運用に拡大する」という流れで、**段階ごとに増やすサービス**と**置き換える構成**を一望する。
 
 ```mermaid
 flowchart LR
-    L1["🌱 <b>Lv.1 個人開発</b><br/>(無料)"] ==> L2["🌿 <b>Lv.2 小規模本番</b><br/>($10-30/月)"]
-    L2 ==> L3["🌳 <b>Lv.3 本格運用</b><br/>($100+/月)"]
-    L3 ==> L4["🌲 <b>Lv.4 エンプラ</b><br/>(従量)"]
+    L1["🌱 <b>Lv.1 検証/小規模</b><br/>(無料)"] ==> L2["🌿 <b>Lv.2 小規模本番</b><br/>($10-30/月)"]
+    L2 ==> L3["🌳 <b>Lv.3 中〜大規模</b><br/>($100+/月)"]
+    L3 ==> L4["🌲 <b>Lv.4 業務利用</b><br/>(従量)"]
 
     style L1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
     style L2 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:3px
@@ -841,16 +841,16 @@ flowchart LR
 
 | Lv | フロント | API | DB | 認証 | シークレット | CI/CD | 監視 |
 | -- | -- | -- | -- | -- | -- | -- | -- |
-| **Lv.1 個人** | SWA Free | SWA同梱Functions | Supabase Free or Cosmos DB Free | SWA組込 | SWA Configuration | GitHub Actions | Portalで目視 |
+| **Lv.1 検証/小規模** | SWA Free | SWA同梱Functions | Supabase Free or Cosmos DB Free | SWA組込 | SWA Configuration | GitHub Actions | Portalで目視 |
 | **Lv.2 小規模本番** | SWA Standard | 同上 or 単独Functions | Azure SQL Basic / PostgreSQL Burstable | Entra ID Free | Key Vault | + Branch protection | Application Insights |
-| **Lv.3 本格運用** | SWA Standard / App Service | App Service or Container Apps | Azure SQL / Cosmos / PostgreSQL（HA構成） | Entra ID P1 | Key Vault + Managed Identity | + Staging slot + 承認ゲート | App Insights + Azure Monitor |
-| **Lv.4 エンプラ** | Front Door + App Service / AKS | AKS or Container Apps | 上記 + Read Replica + Geo-Redundant | Entra ID P2 + Conditional Access | Key Vault + Private Endpoint | Azure Pipelines + Bicep/Terraform | Monitor + Sentinel |
+| **Lv.3 中〜大規模** | SWA Standard / App Service | App Service or Container Apps | Azure SQL / Cosmos / PostgreSQL（HA構成） | Entra ID P1 | Key Vault + Managed Identity | + Staging slot + 承認ゲート | App Insights + Azure Monitor |
+| **Lv.4 業務利用** | Front Door + App Service / AKS | AKS or Container Apps | 上記 + Read Replica + Geo-Redundant | Entra ID P2 + Conditional Access | Key Vault + Private Endpoint | Azure Pipelines + Bicep/Terraform | Monitor + Sentinel |
 
 ```mermaid
 flowchart TB
     subgraph SCALE["📈 育てる方向の典型パス"]
         direction TB
-        S1["① <b>SWA Free + Supabase</b><br/>最速で公開"]
+        S1["① <b>SWA Free + Supabase</b><br/>短時間で公開"]
         S2["② <b>SWA Standard + Azure SQL</b><br/>独自ドメイン・SLA重視"]
         S3["③ <b>App Service + Slot Swap</b><br/>SSR/重いAPI対応"]
         S4["④ <b>Container Apps / AKS</b><br/>マイクロサービス化"]
@@ -864,7 +864,7 @@ flowchart TB
     style S4 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 **Lv.1 → Lv.2 の段差が一番大きい**（Supabaseから Azure SQL への移行、シークレット管理を Key Vault に集約、独自ドメイン取得 等）。Lv.2 を超えると Lv.3/4 は「同じ仕組みを規模拡大していくだけ」になるため、Lv.2 を1度経験しておくのが目安。
+> 📝 **Lv.1 → Lv.2 の段差が大きい**（Supabaseから Azure SQL への移行、シークレット管理を Key Vault に集約、独自ドメイン取得 など）。Lv.2 を超えると Lv.3/4 は「同じ仕組みを規模拡大していく」位置づけになる。
 
 ### 各レベルで足す/置き換える代表的なもの
 
@@ -932,21 +932,21 @@ flowchart TB
         direction TB
         V1["フロント特化"]
         V2["1つで完結"]
-        V3["DX最高 / Next最適化"]
+        V3["DX重視 / Next.js最適化"]
     end
 
     subgraph SP["🟢 Supabase"]
         direction TB
         SP1["バックエンド特化"]
-        SP2["Postgresに全部生やす"]
-        SP3["OSS / 移行性高"]
+        SP2["Postgres中心の構成"]
+        SP3["OSS / 移行性"]
     end
 
     subgraph AZ["🔷 Azure"]
         direction TB
         A1["総合クラウド"]
         A2["部品の組み合わせ"]
-        A3["エンプラ受け◎"]
+        A3["業務利用の機能群が充実"]
     end
 
     style VC fill:#F0F0F0,stroke:#000,stroke-width:2px,color:#000
@@ -963,20 +963,20 @@ flowchart TB
     style A3 fill:#fff,color:#000,stroke:#0078D4
 ```
 
-**結論: 3者は競合ではなく層が違う。**
+**3者は同じ層を競合する関係ではなく、それぞれカバーする範囲が異なる。**
 
-- **Vercel**: フロントエンドのDXが最強。Next.js を作っている会社が運営。「すぐ公開・運用も楽」が最大の価値
-- **Supabase**: バックエンド（DB+認証+ファイル）を1個にまとめた BaaS。Postgresが軸（[supabase.md](../supabase/supabase.md) §14参照）
-- **Azure**: クラウドの**総合デパート**。何でも揃うが組み合わせ力が要る。**エンプラ・社内・規模拡大**に強い
+- **Vercel**: フロントエンドのデプロイ体験に注力。Next.js を運営する会社が提供。公開・運用が簡潔
+- **Supabase**: バックエンド（DB+認証+ファイル）を一式にまとめた BaaS。Postgres が軸（[supabase.md](../supabase/supabase.md) §14参照）
+- **Azure**: 総合クラウド。何でも揃うが組み合わせが必要。**業務利用・組織内利用・規模拡大**の機能が充実
 
-実務的な使い分け:
+利用シナリオの例:
 
 ```mermaid
 flowchart TB
     Q["🎯 何を作る？"] ==> Q1{"規模 / 制約"}
-    Q1 -->|"個人 / 趣味"| C1["⚡ Vercel + Supabase"]
-    Q1 -->|"社内ツール<br/>小規模商用"| C2["🔷 SWA + Supabase or Azure SQL"]
-    Q1 -->|"エンプラ縛り<br/>(社内 / 監査)"| C3["🔷 SWA/App Service +<br/>Azure SQL + Key Vault +<br/>Entra ID + Pipelines"]
+    Q1 -->|"小規模 / 検証"| C1["⚡ Vercel + Supabase"]
+    Q1 -->|"組織内ツール<br/>小規模本番"| C2["🔷 SWA + Supabase or Azure SQL"]
+    Q1 -->|"業務要件<br/>(閉域 / 監査)"| C3["🔷 SWA/App Service +<br/>Azure SQL + Key Vault +<br/>Entra ID + Pipelines"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
@@ -985,4 +985,4 @@ flowchart TB
     style C3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 「**クラウドのデパート1個に、Compute / DB / Auth / DevOps を全部並べたもの**」というのが Azure のしっくりくる説明。Supabase が「Postgres全部入り」、Vercel が「CDN全部入り」だったのに対し、Azure は「全部入りの全部入り」。だからこそ**入り口の Static Web Apps から始めて、必要になったら隣の棚を覗く**、という育て方が向いている（[vercel.md](../vercel/vercel.md) §13 / [supabase.md](../supabase/supabase.md) §14 と対になる構造）。
+> 📝 Azure の位置づけは「**Compute / DB / Auth / DevOps を一通り揃えた総合クラウド**」。Supabase が「Postgres を中心にまとめた構成」、Vercel が「CDN を中心にまとめた構成」だったのに対し、Azure は各機能を**部品として並べる**形を取る。そのため**入り口の Static Web Apps から始めて、必要に応じて関連サービスを追加していく**形で利用するのが一つのパターン（[vercel.md](../vercel/vercel.md) §13 / [supabase.md](../supabase/supabase.md) §14 と対になる構造）。
