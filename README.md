@@ -14,6 +14,7 @@
 | Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [supabase/supabase.md](supabase/supabase.md) |
 | Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [vercel/vercel.md](vercel/vercel.md) |
 | Azure | 総合クラウドの全体像（テナント/サブスク階層 / Static Web Apps / CI-CDの安全弁 / 個人開発→本格運用） | [azure/azure.md](azure/azure.md) |
+| Azure 環境構築手順 | アカウント開設→デプロイ完了までの一連の流れ（CI/CDは GH Actions / Azure Pipelines、DBは Supabase / Azure SQL / PostgreSQL から選択） | [azure/setup.md](azure/setup.md) |
 
 > 今後追加予定: Next.js / Docker / 認証まわり など
 
