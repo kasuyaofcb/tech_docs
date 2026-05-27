@@ -127,7 +127,7 @@ Azureの利用開始時に把握する必要があるのがこの4階層。Verce
 
 ```mermaid
 flowchart TB
-    T["🏢 <b>テナント</b><br/>(=組織の単位 / Entra IDで管理)<br/>例: Default Directory"]
+    T["🏢 <b>テナント</b><br/>(=組織の単位 / Entra IDで管理)<br/>個人アカウントなら自分専用テナント<br/>組織アカウントなら所属組織"]
     T ==> S["💳 <b>サブスクリプション</b><br/>(=請求口座 / 課金単位)<br/>例: Azure 無料試用版"]
     S ==> RG["📦 <b>リソースグループ</b><br/>(=フォルダ / 一括管理単位)<br/>例: rg-my-app"]
     RG ==> R1["🌐 <b>リソース</b><br/>Static Web Apps"]
@@ -151,13 +151,13 @@ flowchart TB
 
 > 📝 「**リソースグループごと削除**」で中身全部消せるので、お試し用に作って終わったら箱ごと捨てる、というのが定番。Free tier で課金されていなくても、**何を作ったか忘れがち**なので習慣化しておくと安全。
 
-### 🚨 テナント切替の罠（最初の地雷）
+### 🚨 複数 Microsoft アカウントセッションの干渉
 
 ```mermaid
 flowchart LR
-    L["🔐 サインイン"] ==> T1["✅ <b>Default Directory</b><br/>(自分専用テナント)"]
-    L ==> T2["⚠️ <b>Microsoft Services</b><br/>その他、見覚えのない組織"]
-    T2 ==>|"アクセスしようとすると"| E["🚫 'アカウントが<br/>テナントに存在しません'"]
+    L["🔐 サインイン"] ==> T1["✅ <b>自分のテナント</b><br/>(サブスクリプションが見える)"]
+    L ==> T2["⚠️ <b>別のテナント</b><br/>(他のMicrosoftアカウントの<br/>セッションが残っている)"]
+    T2 ==>|"アクセスしようとすると"| E["🚫 'アカウントが<br/>テナントに存在しません' 等"]
 
     style L fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
     style T1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -165,7 +165,9 @@ flowchart LR
     style E fill:#C0392B,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-ブラウザに古い Microsoft セッションが残っていると、自動的に**別組織のテナント**を参照してエラーになる。`portal.azure.com` 右上のディレクトリ表示が「Default Directory」になっていることを必ず確認する。改善しない場合は **別ブラウザまたはシークレットウィンドウ**で `azure.microsoft.com/free` から入り直す。
+ブラウザに古い Microsoft セッションが残っていると、自動的に**別組織のテナント**を参照してエラーになる。**確実な確認方法**は、`portal.azure.com` の上部検索バーから「サブスクリプション」を開き、自分のサブスクリプション（例: `Azure subscription 1`）が一覧表示されることを確認すること。表示されない / アクセス拒否のエラーが出る場合は、**別ブラウザまたはシークレットウィンドウ**で `azure.microsoft.com/free` から入り直す。
+
+> 📝 右上のディレクトリ表示ラベル（「Default Directory」「既定のディレクトリ」「組織名」など）は言語設定や組織構成で表記が変動するため、**ラベルの目視一致では判定しにくい**。「サブスクリプションが見えるか」という機能的確認の方が確実。
 
 ---
 
@@ -917,7 +919,7 @@ flowchart LR
 | URLが404 | **Portal → SWA → 構成 / ルーティング設定** |
 | Preview URLが出ない | PRの **Checks** タブ（コメントではなく） |
 | 環境変数が反映されない | `NEXT_PUBLIC_*` ならGitHub Secrets、それ以外なら Configuration |
-| 「テナントエラー」 | 右上ディレクトリを **Default Directory** へ切替 |
+| 「テナントエラー」 | Portal で「サブスクリプション」を開いて自分のサブスクリプションが見えるか確認。見えなければ別ブラウザ / シークレットウィンドウで入り直す |
 | 何か変 | **Portal → 概要** の状態欄 |
 
 「デプロイは成功してるのに動かない」のほとんどは **環境変数の置き場違い** か **NEXT_PUBLIC_系のビルド時埋め込み忘れ**。
