@@ -25,15 +25,17 @@ flowchart TB
     P2 --> A["🅰️ GitHub Actions版<br/>(GitHub利用可能な環境)"]
     P2 --> B["🅱️ Azure Pipelines版<br/>(自社リポジトリ前提の環境)"]
 
-    A ==> P3["🟣 <b>Part 3</b><br/>DB選択<br/>(3択)"]
+    A ==> P3["🟣 <b>Part 3</b><br/>DB選択<br/>(4択)"]
     B ==> P3
     P3 --> X["Ⓧ Supabase併用<br/>(BaaS型)"]
     P3 --> Y["Ⓨ Azure SQL Database<br/>(業務利用向け)"]
     P3 --> Z["Ⓩ Azure PostgreSQL<br/>(OSS互換)"]
+    P3 --> W["Ⓦ Azure Cosmos DB<br/>(NoSQL / Free Tier)"]
 
     X ==> P4["🟢 <b>Part 4</b><br/>つなぎ込み + デプロイ確認"]
     Y ==> P4
     Z ==> P4
+    W ==> P4
 
     P4 ==> END["🎉 公開完了"]
 
@@ -46,6 +48,7 @@ flowchart TB
     style X fill:#3ECF8E,color:#FFFFFF,stroke:#333,stroke-width:2px
     style Y fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
     style Z fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style W fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
     style END fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
@@ -332,11 +335,13 @@ flowchart LR
 - Variable group を紐付け
 - Run pipeline → ビルド成功 → SWA に反映
 
-> 📝 **社内ネットワーク縛り**で Microsoft-hosted Agent が使えない場合は、Step ⑦ の `pool:` を `pool: name: <自前エージェントプール名>` に変えて、別途 Self-hosted Agent を社内VMにインストールする。Agent はアウトバウンドのみで Pipelines と通信するのでファイアウォールを開ける必要なし（[azure.md §11.3](azure.md) 参照）。
+> 📝 **閉域ネットワーク要件**で Microsoft-hosted Agent が使えない場合は、Step ⑦ の `pool:` を `pool: name: <自前エージェントプール名>` に変えて、別途 Self-hosted Agent を組織内VMにインストールする。Agent はアウトバウンドのみで Pipelines と通信するためファイアウォールを開ける必要はない（[azure.md §11.3](azure.md) 参照）。
 
 ---
 
 # Part 3: DB選択
+
+> 🚨 **DB選択の変更はコードの修正を伴う**: SDK / クエリ言語 / 認証連携が DB ごとに異なるため、後から DB を切り替える場合は**アプリ側のコード書き換え**（SDK 差し替え、クエリ書き直しなど）が必要になる。最初の選択時点で運用シナリオを検討しておくと、後の手戻りを抑えられる。
 
 ```mermaid
 flowchart TB
@@ -345,12 +350,14 @@ flowchart TB
     Q1 -->|"BaaS型で<br/>認証+RLS込み"| X["Ⓧ <b>Supabase併用</b><br/>(3-X)<br/>所要15分"]
     Q1 -->|"Microsoft製品<br/>との統合"| Y["Ⓨ <b>Azure SQL Database</b><br/>(3-Y)<br/>所要20分"]
     Q1 -->|"OSS Postgres<br/>移行性重視"| Z["Ⓩ <b>Azure PostgreSQL</b><br/>(3-Z)<br/>所要20分"]
+    Q1 -->|"NoSQL / Free Tier<br/>1サブスク1個まで"| W["Ⓦ <b>Azure Cosmos DB</b><br/>(3-W)<br/>所要15分"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
     style X fill:#3ECF8E,color:#FFFFFF,stroke:#333,stroke-width:2px
     style Y fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
     style Z fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style W fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -470,6 +477,72 @@ flowchart LR
 > 📝 **「Single Server」は選ばない**: 旧世代で廃止予定。必ず **Flexible Server** を選ぶ。
 
 > 📝 **Supabase からの移行**: Supabase の Dashboard → Database → Backups から dump を取り、Azure PostgreSQL に `pg_restore` で投入できる。スキーマはそのまま利用可能（RLSポリシーは標準Postgresの機能なので移植可能）。
+
+---
+
+## 3-W. Azure Cosmos DB (NoSQL / Free Tier)
+
+Microsoft 製のグローバル分散 NoSQL DB。**1サブスクリプションにつき1個の Free Tier 枠**（1000 RU/s + 25 GB）が永続的に使える。
+
+```mermaid
+flowchart LR
+    S1["①<br/>Portalで<br/>'Cosmos DB'検索"] ==> S2["②<br/>+ 作成 →<br/>'Cosmos DB for NoSQL'"]
+    S2 ==> S3["③<br/>基本情報<br/>(アカウント名/リージョン)"]
+    S3 ==> S4["④<br/>ワークロードの種類<br/>(必須・新項目)"]
+    S4 ==> S5["⑤<br/>Free レベル割引を<br/>'適用'"]
+    S5 ==> S6["⑥<br/>作成 (3-5分)"]
+    S6 ==> S7["⑦<br/>データベース<br/>+ コンテナ作成"]
+    S7 ==> S8["✅<br/>接続文字列<br/>コピー"]
+
+    style S1 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S4 fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S5 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style S6 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S7 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S8 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+**作成時の入力:**
+
+| 項目 | 入れる値 |
+| --- | --- |
+| リソースグループ | `rg-my-app` |
+| アカウント名 | `cosmos-my-app` (Azure全体でユニーク・44文字以内・英数小文字) |
+| API の種類 | **Azure Cosmos DB for NoSQL** (Free Tier 対象) |
+| 場所（リージョン） | Japan East (近場) |
+| 容量モード | プロビジョニングされたスループット |
+| **Free レベルの割引を適用** | ✅ **適用** （重要） |
+| **ワークロードの種類** | 学習 / 開発・テスト / 運用 から選択（**必須項目**） |
+| 全体的なバックアップポリシー | Periodic（定期的） |
+
+> 🚨 **Free Tier は 1 サブスクリプションにつき 1 個まで**: 既に別の Cosmos アカウントで Free 枠を使っていると、「適用」がグレーアウトする。Free 枠を使う場合は、不要な Cosmos アカウントを削除してから新規作成する。
+
+> 🚨 **「ワークロードの種類」は必須項目**: Azure が追加した必須項目。空欄のままだと「Basics」タブにエラーが出て先に進めない。学習目的なら「学習」、検証や本番なら「開発・テスト」または「運用」を選ぶ。
+
+> 🚨 **リージョン選択肢が出ない場合**: 新規 Free Trial サブスクリプション直後は、リージョン解放が限定され「EUAP」系（プレビュー用リージョン）しか出ないことがある。EUAP は Cosmos DB では使えないため、**Portal で詰まる**。この場合は本資料末尾の「困ったときの初動」で案内する Azure CLI 経由での作成に切り替える。
+
+### データベースとコンテナの作成
+
+Cosmos DB アカウントができたら、**データベース（論理的なまとまり）**と**コンテナ（テーブル相当）**を順に作成する。
+
+| 階層 | 役割 | 例 |
+| --- | --- | --- |
+| アカウント | 認証・接続単位 | `cosmos-my-app` |
+| データベース | 名前空間 | `myappdb` |
+| コンテナ | データの入れ物（テーブル相当） | `items` |
+| パーティションキー | 分散のためのキー | `/userId` など |
+
+> 📝 **パーティションキーの設計**は Cosmos DB の性能に直結する。クエリで頻繁に絞る項目（例: `userId`, `tenantId`）を選ぶ。後から変更できないため、初回の選択は慎重に。
+
+### 接続文字列の取得
+
+- 作成完了後、アカウントリソースを開く
+- 左メニュー「キー」→ 「PRIMARY CONNECTION STRING」をコピー
+- `AccountEndpoint=...;AccountKey=...;` 形式の文字列
+
+> 🚨 接続文字列は実質的に管理者キーと同等。Part 4 で **SWA Configuration** または **Key Vault** に登録し、コードに直接書き込まない。
 
 ---
 
@@ -616,6 +689,7 @@ flowchart TB
     Q -->|"DB繋がらない"| A4["📍 ファイアウォール<br/>+ 接続文字列"]
     Q -->|"環境変数効かない"| A5["📍 ビルド時=Secrets<br/>実行時=Configuration"]
     Q -->|"課金状況を見たい"| A6["📍 コスト管理 →<br/>予算アラート設定"]
+    Q -->|"リージョン選択肢<br/>が出ない"| A7["📍 Azure CLI で<br/>リソース作成"]
 
     style P fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
     style Q fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
@@ -625,9 +699,56 @@ flowchart TB
     style A4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
     style A5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
     style A6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style A7 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
 詳しい切り分け表は [azure.md §15](azure.md) 参照。
+
+## 付録: Azure Portal で詰まったら — Azure CLI という選択肢
+
+Azure Portal は GUI で操作できる利点がある一方で、**新規 Free Trial サブスクリプション直後のリージョン制限**や**Portal 側のバリデーションエラー**で詰まることがある。そのような場合、**Azure CLI (`az` コマンド)** を使うと Portal の制約を回避してリソースを作成できることが多い。
+
+```mermaid
+flowchart LR
+    P["⚠️ Portal で<br/>詰まった"] ==> Q{"症状"}
+
+    Q -->|"リージョン選択肢<br/>に Japan East 等が<br/>出ない"| C1["✅ Azure CLI で<br/>明示指定して作成"]
+    Q -->|"特定のフォーム<br/>項目でエラー"| C2["✅ Azure CLI で<br/>該当オプションを指定"]
+    Q -->|"複数リソースを<br/>一括作成したい"| C3["✅ Azure CLI を<br/>スクリプト化"]
+
+    style P fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style Q fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
+    style C1 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style C2 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style C3 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+### Azure CLI の導入と使い方の流れ
+
+```mermaid
+flowchart LR
+    S1["①<br/>Azure CLI を<br/>インストール<br/>(brew/winget等)"] ==> S2["②<br/>az login<br/>(ブラウザで認証)"]
+    S2 ==> S3["③<br/>az ○○ create<br/>(対象リソース作成)"]
+    S3 ==> S4["④<br/>az ○○ keys list<br/>等で接続情報取得"]
+    S4 ==> S5["✅<br/>Portal にも<br/>作成済みリソースが<br/>表示される"]
+
+    style S1 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+### よくある回避シナリオ
+
+| 症状 | Portal | Azure CLI |
+| --- | --- | --- |
+| Cosmos DB のリージョン選択肢に Japan East が出ない | × 詰まる | ✅ `--locations regionName=japaneast` で指定可能 |
+| Free Trial 直後のリージョン制限 (EUAP系のみ) | × 詰まる | ✅ サポート済みリージョンを直接指定 |
+| 必須項目の追加でフォームが弾かれる | × エラー | ✅ コマンドラインオプションで全項目を指定 |
+| 同じ構成を別環境に複製したい | △ 手動繰り返し | ✅ スクリプト化で一括作成 |
+
+> 📝 Azure CLI と Portal は**同じバックエンドAPI**を呼んでいるため、CLI で作ったリソースも Portal で確認・編集できる。「CLI で作るとPortalで管理できない」ということはない。インストール手順とコマンドリファレンスは Microsoft Learn の「Azure CLI のインストール」「Azure CLI コマンドリファレンス」を参照。本資料では具体的なコマンドは扱わず、**選択肢の存在**のみ案内する。
 
 ---
 

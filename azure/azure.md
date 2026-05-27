@@ -239,7 +239,7 @@ flowchart TB
 | **Container Apps** | コンテナ型・マイクロサービス | 従量 | △ | ◯ |
 | **Functions** | 単発処理・Webhook・定期実行 | 100万回/月無料 | ◯ | △ |
 | **VM** | OSレベルから自由に構成 | $7/月〜 | △ | △ |
-| **AKS** | Kubernetesクラスター運用 | 高い | × | ◯ |
+| **AKS** | Kubernetesクラスタ運用 | 高い | × | ◯ |
 
 > 📝 構成パターンの一例として、Static Web Apps から始め、SSR や複雑なAPIが必要になれば App Service、コンテナ運用に移行する場合は Container Apps を選ぶ、という段階的な切替が考えられる。
 
