@@ -121,7 +121,7 @@ flowchart TB
 
 ## 3. Azure特有の階層 — テナント / サブスクリプション / リソースグループ / リソース
 
-Azureを使う上で**最初に必ずつまずく**のがこの4階層。Vercel や Supabase には無い独特の概念で、ここを理解すると一気にスッキリする。
+Azureを使う上で**最初に必ずつまずく**のがこの4階層。Vercel や Supabase にはない独特の概念で、ここを理解すると一気にスッキリする。
 
 ```mermaid
 flowchart TB
@@ -514,7 +514,193 @@ flowchart TB
 | **GitLab/Bitbucket** | SWA作成時は「No Source」で作り、上記CLI経由 | — |
 | **手動デプロイ** | ローカルから同じCLI | お試し/緊急用 |
 
-> 📝 大企業で **GitHub 直接利用が難しい** 場合、**Azure DevOps Pipelines** が最も現実的（Microsoft製のため監査・ID連携が強い）。GitHub Actions のワークフローと Pipelines の YAML は構造が似ていて、移行は比較的素直。
+### 11.1 Azure DevOps の中身 — Pipelines は5部品の1つ
+
+「Azure DevOps」は単一サービスではなく、**5つのサービスをまとめたスイート**（`dev.azure.com` 配下）。CI/CD 文脈で主役なのは Pipelines だが、社内縛り環境では **Repos も合わせて選ぶ**ことが多い（=「GitHub と GitHub Actions を Azure 内で両方代替」）。
+
+```mermaid
+flowchart TB
+    AZD["🏢 <b>Azure DevOps</b><br/>(dev.azure.com)"]
+
+    AZD --> P1["🚀 <b>Pipelines</b><br/>CI/CD<br/>(GH Actions相当)"]
+    AZD --> P2["📦 <b>Repos</b><br/>Gitホスティング<br/>(GitHub相当)"]
+    AZD --> P3["📋 <b>Boards</b><br/>課題管理<br/>(GH Issues相当)"]
+    AZD --> P4["🗄️ <b>Artifacts</b><br/>パッケージ管理<br/>(npm/NuGet等)"]
+    AZD --> P5["🧪 <b>Test Plans</b><br/>テスト計画管理<br/>(手動QA寄り)"]
+
+    style AZD fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style P1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P3 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P4 fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P5 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+| サービス | GitHub対応物 | 個人開発 | エンプラ |
+| --- | --- | :---: | :---: |
+| **Pipelines** | GitHub Actions | ⭐⭐ | ⭐⭐⭐ |
+| **Repos** | GitHub本体 | △ | ⭐⭐⭐ |
+| **Boards** | GitHub Issues / Projects | △ | ⭐⭐⭐ |
+| **Artifacts** | GitHub Packages | △ | ⭐⭐ |
+| **Test Plans** | （独自・GitHubにない） | × | ⭐⭐ |
+
+> 📝 「GitHubを丸ごとAzure側で代替」したいなら **Repos + Pipelines** をセットで使う。両方とも **Entra ID (AAD)** で社員アカウント連携でき、Microsoft 365 と権限管理を一元化できる。
+
+### 11.2 GitHub Actions ⇄ Azure Pipelines マッピング
+
+YAML の作りはそっくりで、概念単位で**素直に翻訳できる**。既存の GH Actions ワークフローを書き換える際のチートシート。
+
+```mermaid
+flowchart LR
+    subgraph GHA["🟪 GitHub Actions"]
+        direction TB
+        G1["📄 .github/workflows/<br/>*.yml"]
+        G2["on: push"]
+        G3["jobs:"]
+        G4["runs-on: ubuntu-latest"]
+        G5["steps:<br/>- uses: actions/..."]
+        G6["secrets.MY_KEY"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end
+
+    subgraph ADP["🟦 Azure Pipelines"]
+        direction TB
+        A1["📄 azure-pipelines.yml"]
+        A2["trigger: / pr:"]
+        A3["stages: / jobs:"]
+        A4["pool: vmImage:<br/>'ubuntu-latest'"]
+        A5["steps:<br/>- task: ...@1"]
+        A6["$(MY_KEY)<br/>(Variable group)"]
+        A1 --> A2 --> A3 --> A4 --> A5 --> A6
+    end
+
+    GHA -.->|"翻訳"| ADP
+
+    style GHA fill:#F0F0F0,stroke:#8E44AD,stroke-width:2px,color:#000
+    style ADP fill:#E5F1FB,stroke:#0078D4,stroke-width:2px,color:#000
+    style G1 fill:#fff,color:#000,stroke:#8E44AD
+    style G2 fill:#fff,color:#000,stroke:#8E44AD
+    style G3 fill:#fff,color:#000,stroke:#8E44AD
+    style G4 fill:#fff,color:#000,stroke:#8E44AD
+    style G5 fill:#fff,color:#000,stroke:#8E44AD
+    style G6 fill:#fff,color:#000,stroke:#8E44AD
+    style A1 fill:#fff,color:#000,stroke:#0078D4
+    style A2 fill:#fff,color:#000,stroke:#0078D4
+    style A3 fill:#fff,color:#000,stroke:#0078D4
+    style A4 fill:#fff,color:#000,stroke:#0078D4
+    style A5 fill:#fff,color:#000,stroke:#0078D4
+    style A6 fill:#fff,color:#000,stroke:#0078D4
+```
+
+| GitHub Actions | Azure Pipelines | 役割 |
+| --- | --- | --- |
+| `.github/workflows/*.yml` | `azure-pipelines.yml` | パイプライン定義ファイル |
+| `on:` | `trigger:` / `pr:` | トリガー（push/PR） |
+| `jobs:` | `jobs:` / `stages:` | 並列実行単位 |
+| `runs-on:` | `pool:` | 実行マシン指定 |
+| `steps:` + `uses:` | `steps:` + `task:` | 再利用部品 |
+| `secrets.*` | `$(name)` + Variable Group | シークレット参照 |
+| `env:` | `variables:` | 環境変数 |
+| `environment:` | `environment:` + Approval | 環境ゲート・承認 |
+
+> 📝 SWA 専用タスク **`AzureStaticWebApp@0`** が Microsoft 公式に用意されているので、GH Actions の `Azure/static-web-apps-deploy@v1` と1対1で置き換えられる。NEXT_PUBLIC_* 系のビルド時埋め込み（§10）も `env:` で渡せばよく、考え方は同じ。
+
+### 11.3 エンプラで響く3つの理由 — 閉域 / AAD / 監査
+
+社内でGitHubが使いにくい状況の本質は「**外部にコード/資格情報を出したくない**」「**社員アカウントで一元管理したい**」「**監査ログがほしい**」の3点。Azure DevOps Pipelines はここに**標準対応**する。
+
+```mermaid
+flowchart TB
+    R["🏢 エンプラ要件"] --> R1{"必要なもの"}
+
+    R1 --> N1["🛡️ <b>閉域ネットワーク</b><br/>ビルドマシンを<br/>社内に置きたい"]
+    R1 --> N2["🛂 <b>SSO / ID統合</b><br/>社員アカウントで<br/>そのまま使う"]
+    R1 --> N3["📜 <b>監査</b><br/>誰がいつ何をしたか<br/>記録/出力"]
+
+    N1 --> S1["✅ <b>Self-hosted Agent</b><br/>社内サーバー/VMに<br/>エージェント常駐"]
+    N2 --> S2["✅ <b>Entra ID (AAD)</b><br/>連携<br/>Service Principal<br/>でAzure操作"]
+    N3 --> S3["✅ <b>Azure Monitor</b><br/>連携<br/>監査ログ集約"]
+
+    style R fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style R1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
+    style N1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style N2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style N3 fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S3 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+#### Self-hosted Agent — 閉域ネットワークの肝
+
+```mermaid
+flowchart LR
+    subgraph CLOUD["☁️ Microsoft-hosted (デフォルト)"]
+        MH["🟦 Microsoft<br/>データセンター<br/>のVM"]
+    end
+
+    subgraph INTRA["🏢 社内ネットワーク (閉域)"]
+        SH["🟩 <b>Self-hosted</b><br/><b>Agent</b><br/>社内サーバー"]
+        SC["🗄️ 社内Git/<br/>社内DB/<br/>社内API"]
+        SH ---|"閉域内で完結"| SC
+    end
+
+    P["🟦 Azure Pipelines<br/>(クラウド側のオーケストレータ)"] -.->|"ジョブ指示"| MH
+    P -.->|"ジョブ指示 (アウトバウンドのみ)"| SH
+
+    style CLOUD fill:#E5F1FB,stroke:#0078D4,stroke-width:2px,color:#000
+    style INTRA fill:#E8F8E8,stroke:#27AE60,stroke-width:2px,color:#000
+    style P fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style MH fill:#fff,color:#000,stroke:#0078D4
+    style SH fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style SC fill:#fff,color:#000,stroke:#27AE60
+```
+
+| 項目 | Microsoft-hosted | Self-hosted |
+| --- | --- | --- |
+| 動く場所 | Microsoft のクラウド | 社内サーバー / VM |
+| インターネット必須 | ✅ 必要 | ❌ アウトバウンドのみで可 |
+| 無料枠 | 1,800分/月（Private） | 自前マシン |
+| 社内DB/社内APIアクセス | ❌ 不可（外から見えない） | ✅ 可 |
+| 構築の手間 | ゼロ | エージェントインストール必要 |
+
+> 📝 Agent は**アウトバウンドの長時間ポーリング**で Pipelines クラウドから「次のジョブ」を取りに行く方式。**社内ファイアウォール越しでも疎通可能**で、社内側でポートを開ける必要がない。これが「閉域でも回せる」最大の理由。
+
+#### AAD連携 + Service Principal — 人ではなくロボットIDで認証
+
+```mermaid
+flowchart LR
+    DEV["👤 社員<br/>(Entra ID)"] ==>|"SSO"| ADO["🟦 Azure DevOps"]
+    ADO ==>|"Service Connection"| SP["🤖 <b>Service Principal</b><br/>(ロボット ID)"]
+    SP ==>|"RBAC で必要権限のみ"| AR["🔷 Azureリソース<br/>(SWA / Key Vault等)"]
+
+    style DEV fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style ADO fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style SP fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
+    style AR fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+> 📝 **Service Principal** = Pipelines が Azure リソースを操作するための**専用ロボットアカウント**。「人間のパスワードをパイプラインに埋め込む」のではなく、ロボットIDに最小権限だけ与える。退職者対応・権限剥奪が AAD で一元化できるのがエンプラで効く。
+
+### 11.4 エンプラ移行の現実的なレシピ
+
+```mermaid
+flowchart LR
+    Step1["① GitHub Actions で<br/>動く構成を作る<br/>(個人開発)"] ==> Step2["② Azure Repos に<br/>コードを移送"]
+    Step2 ==> Step3["③ workflow.yml を<br/>azure-pipelines.yml に翻訳<br/>(§11.2 マッピング)"]
+    Step3 ==> Step4["④ Self-hosted Agent<br/>を社内に立てる"]
+    Step4 ==> Step5["⑤ Service Connection<br/>(Service Principal)<br/>でAzure接続"]
+    Step5 ==> Step6["✅ 閉域 + AAD +<br/>監査 全部満たす"]
+
+    style Step1 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style Step2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style Step3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style Step4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style Step5 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style Step6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+> 📝 個人開発段階で GitHub Actions に慣れておけば、エンプラ段階でも **「同じYAMLを翻訳するだけ」** に持ち込める。最初から Pipelines で組む必要はなく、**①〜⑤を順番に置き換える**のが現実的。
 
 ---
 
