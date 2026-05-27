@@ -125,7 +125,7 @@ Azureを使う上で**最初に必ずつまずく**のがこの4階層。Vercel 
 
 ```mermaid
 flowchart TB
-    T["🏢 <b>テナント</b><br/>(=組織の単位 / Entra IDで管理)<br/>例: default-tenant のディレクトリ"]
+    T["🏢 <b>テナント</b><br/>(=組織の単位 / Entra IDで管理)<br/>例: Default Directory"]
     T ==> S["💳 <b>サブスクリプション</b><br/>(=請求口座 / 課金単位)<br/>例: Azure 無料試用版"]
     S ==> RG["📦 <b>リソースグループ</b><br/>(=フォルダ / 一括管理単位)<br/>例: rg-my-app"]
     RG ==> R1["🌐 <b>リソース</b><br/>Static Web Apps"]
@@ -404,7 +404,7 @@ flowchart TB
 
 両者の機能・概念を1対1で並べると、移行や比較の地図になる。
 
-| Vercel	| Azure 側の相当物 | 補足 |
+| Vercel | Azure 側の相当物 | 補足 |
 | --- | --- | --- |
 | **Preview Deployments** | **Static Web Apps Staging environments** / **App Service Deployment Slots** | PR毎に自動で別URL |
 | **アトミックデプロイ** | **Slot Swap** | 新バージョンに瞬時切替 |
@@ -466,7 +466,7 @@ flowchart TB
 
 > 🚨 **`NEXT_PUBLIC_*` の罠**: Next.js の `NEXT_PUBLIC_*` 系は**ビルド時にコードへ埋め込まれる**。**SWA Configuration に入れても意味がない**（実行時にしか参照されないため）。必ず **GitHub Secrets** に登録し、ワークフローの `env:` で渡す。
 
-> 📝 環境変数の基本概念は [git.md](../git/git.md) §8 / [vercel.md](../vercel/vercel.md) §7 を参照。Vercel と同じく「Production / Preview（=Staging）/ Development」を分けて持てる発想は健在。
+> 📝 環境変数の基本概念は [git.md](../git/git.md) §8 / [vercel.md](../vercel/vercel.md) §7 を参照。Vercel が「Production / Preview / Development」の3環境で**自動的に分けて持てる**のに対し、Azureでは **GitHub Environments**（Actionsの環境別シークレット）や **deployment slot 別の Configuration** を**自分で組む**必要がある。ここはVercelの方が一歩楽。
 
 ### Key Vault を挟むメリット
 
@@ -496,7 +496,7 @@ flowchart TB
 
     Q1 -->|"Microsoft純正"| P1["🔷 <b>Azure DevOps<br/>Pipelines</b><br/>AAD/閉域ネットワーク◎"]
     Q1 -->|"任意のCIから"| P2["🟢 <b>SWA CLI</b><br/>deployment tokenで<br/>どこからでも push可"]
-    Q1 -->|"GitLab/Bitbucket"| P3["🟠 各CI + SWA CLI<br/>(直接連携は不可)"]
+    Q1 -->|"GitLab/Bitbucket"| P3["🟠 各CIから<br/>SWA CLI経由<br/>(SWA作成は「No Source」)"]
     Q1 -->|"手動デプロイ"| P4["🟣 ローカルから<br/>swa deploy"]
 
     style Q fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
@@ -589,7 +589,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Q["🤔 'private にしたい'"] ==> A{"どっちの<br/>private？"}
+    Q["🤔 「private にしたい」"] ==> A{"どっちの<br/>private？"}
     A -->|"ソースコードを隠す"| P1["📦 <b>リポジトリを Private</b><br/>GitHub側の設定<br/>✅ Free tierでOK"]
     A -->|"サイト自体に<br/>ログインを要求"| P2["🔐 <b>サイトに認証</b><br/>Azure側の機能<br/>(SWA組込 or Entra ID)"]
 
@@ -604,12 +604,12 @@ flowchart LR
 ```mermaid
 flowchart LR
     G["GitHub<br/>リポジトリ作成"] ==>|"Private 選択"| R["📦 Private リポ"]
-    R ==>|"Azure 連携時"| A["⚙️ Azure 認可で<br/>'Only select repositories'<br/>を選ぶ"]
-    A ==> S["✅ そのリポだけ<br/>Azureに見える"]
+    R ==>|"Azure 連携時"| AC["⚙️ Azure 認可で<br/>「Only select repositories」<br/>を選ぶ"]
+    AC ==> S["✅ そのリポだけ<br/>Azureに見える"]
 
     style G fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
     style R fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style A fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style AC fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
     style S fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
