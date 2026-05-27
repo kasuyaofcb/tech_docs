@@ -591,4 +591,4 @@ flowchart TB
 - 「将来データをエクスポートして他のPostgresに引っ越し」も普通にできる
 - 既存のSQL知識・PostgresのナレッジがそのままSupabaseに通用する
 
-> 📝 「**Postgres 1個に、Auth/Storage/Realtime/Functions を全部生やしたもの**」というのが一番しっくりくる説明。
+> 📝 「**Postgres 1個に、Auth/Storage/Realtime/Functions を全部生やしたもの**」というのが一番しっくりくる説明。Vercelが「**CDNに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」と対になる構造（[vercel.md](../vercel/vercel.md) §13 / [azure.md](../azure/azure.md) §16 参照）。Azureに寄せて作るなら、Supabaseの代わりに **Azure SQL Database / PostgreSQL / Cosmos DB** という選択肢があり、詳しくは [azure.md](../azure/azure.md) §7 を参照。

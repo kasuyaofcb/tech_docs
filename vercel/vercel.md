@@ -458,7 +458,7 @@ flowchart LR
 
 ---
 
-## 13. 補足: Netlify / Cloudflare Pages との違い
+## 13. 補足: Netlify / Cloudflare Pages / Azure SWA との違い
 
 ```mermaid
 flowchart TB
@@ -483,9 +483,17 @@ flowchart TB
         C3["ネットワーク層が強力"]
     end
 
+    subgraph AZ["🔷 Azure Static Web Apps"]
+        direction TB
+        A1["総合クラウドの一部"]
+        A2["Free tierでも商用OK"]
+        A3["エンプラ/社内縛りに強い"]
+    end
+
     style VC fill:#F0F0F0,stroke:#000,stroke-width:2px,color:#000
     style NL fill:#E8F8E8,stroke:#27AE60,stroke-width:2px,color:#000
     style CF fill:#FFF4E5,stroke:#E67E22,stroke-width:2px,color:#000
+    style AZ fill:#E5F1FB,stroke:#0078D4,stroke-width:2px,color:#000
     style V1 fill:#fff,color:#000,stroke:#000
     style V2 fill:#fff,color:#000,stroke:#000
     style V3 fill:#fff,color:#000,stroke:#000
@@ -495,12 +503,16 @@ flowchart TB
     style C1 fill:#fff,color:#000,stroke:#E67E22
     style C2 fill:#fff,color:#000,stroke:#E67E22
     style C3 fill:#fff,color:#000,stroke:#E67E22
+    style A1 fill:#fff,color:#000,stroke:#0078D4
+    style A2 fill:#fff,color:#000,stroke:#0078D4
+    style A3 fill:#fff,color:#000,stroke:#0078D4
 ```
 
-**結論: 3社とも「Gitに繋いでpushすればデプロイ」という体験は同じ。差は周辺機能と最適化の方向性。**
+**結論: 4者とも「Gitに繋いでpushすればデプロイ」という体験は同じ。差は周辺機能と最適化の方向性。**
 
 - **Vercel**: Next.jsを作っている会社が運営。Next.jsを使うなら最短ルート
 - **Netlify**: 一番老舗。Vercelより前からこのモデルを作った
 - **Cloudflare Pages**: 帯域無料・ネットワーク強力。コストとパフォーマンス重視ならアリ
+- **Azure Static Web Apps**: Microsoftの総合クラウドの一部。**Free tierで商用OK**（Vercel Hobbyより緩い）、エンプラ/社内環境縛りなら本命（[azure.md](../azure/azure.md) §6参照）
 
-> 📝 「**CDN 1個に、Build / Functions / Preview URL を全部生やしたもの**」というのが一番しっくりくる説明。Supabaseが「**Postgresに全部生やしたもの**」だったのと対になる構造（[supabase.md](../supabase/supabase.md) §14参照）。
+> 📝 「**CDN 1個に、Build / Functions / Preview URL を全部生やしたもの**」というのが一番しっくりくる説明。Supabaseが「**Postgresに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」だったのと対になる構造（[supabase.md](../supabase/supabase.md) §14 / [azure.md](../azure/azure.md) §16 参照）。
