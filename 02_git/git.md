@@ -269,7 +269,7 @@ flowchart LR
 - 📦 `node_modules/` / `venv/` → 巨大で再生成可能
 - 🗂 `.DS_Store` / エディター設定 → OS/個人依存のゴミ
 
-> 📝 **`.env` と環境変数**: `.env` は「**環境変数**」（プログラムに外から渡す設定値）を書き込んでおくファイル。`API_KEY=abc123` のように「名前=値」のペアで書き、コードからは名前で呼び出す。**コード本体に秘密情報を書かないための仕組み**。本番ではVercelやSupabaseの管理画面側に同じ環境変数を登録する（[vercel.md](../vercel/vercel.md) §7 / [supabase.md](../supabase/supabase.md) §12参照）。
+> 📝 **`.env` と環境変数**: `.env` は「**環境変数**」（プログラムに外から渡す設定値）を書き込んでおくファイル。`API_KEY=abc123` のように「名前=値」のペアで書き、コードからは名前で呼び出す。**コード本体に秘密情報を書かないための仕組み**。本番ではVercelやSupabaseの管理画面側に同じ環境変数を登録する（[vercel.md](../04a_vercel/vercel.md) §7 / [supabase.md](../03_supabase/supabase.md) §12参照）。
 
 このリポジトリの[.gitignore](../../.gitignore)が実例なので見てみよう。
 

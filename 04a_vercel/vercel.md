@@ -175,7 +175,7 @@ flowchart TB
     style PRV fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 「**Production = mainブランチ**」が初期設定。設定で別ブランチを本番にすることもできるが、まずはこの形で覚えればOK。詳細は [git.md](../git/git.md) §4 のPRフローと組み合わせて読むと理解が深まる。
+> 📝 「**Production = mainブランチ**」が初期設定。設定で別ブランチを本番にすることもできるが、まずはこの形で覚えればOK。詳細は [git.md](../02_git/git.md) §4 のPRフローと組み合わせて読むと理解が深まる。
 
 ---
 
@@ -263,7 +263,7 @@ flowchart LR
 
 ## 7. 環境変数 — 3つの環境を使い分ける
 
-> 📝 **環境変数** = APIキー・パスワード・DBの接続先など、「**コードに直接書き込みたくない設定値**」を外から渡す仕組み。たとえば`API_KEY=abc123`のように「名前と値」のペアで持つ。コードからは「名前」で呼び出す。Git管理から外したい秘密情報の置き場として標準的（[git.md](../git/git.md) §8 の `.env` の話と地続き）。
+> 📝 **環境変数** = APIキー・パスワード・DBの接続先など、「**コードに直接書き込みたくない設定値**」を外から渡す仕組み。たとえば`API_KEY=abc123`のように「名前と値」のペアで持つ。コードからは「名前」で呼び出す。Git管理から外したい秘密情報の置き場として標準的（[git.md](../02_git/git.md) §8 の `.env` の話と地続き）。
 
 VercelはAPIキーなどを**3つの環境（Production / Preview / Development）ごとに分けて持てる**のが特徴。
 
@@ -390,7 +390,7 @@ flowchart LR
 
 注意点として、DBのスキーマ（テーブル構造）が変わっている場合は古いコードが新しいDBで動かないこともある。コードだけで完結する変更でないなら、慎重にロールバック。
 
-> 🚨 [supabase.md](../supabase/supabase.md) §11のマイグレーション運用と合わせて考える。
+> 🚨 [supabase.md](../03_supabase/supabase.md) §11のマイグレーション運用と合わせて考える。
 
 ---
 
@@ -513,6 +513,6 @@ flowchart TB
 - **Vercel**: Next.jsを作っている会社が運営。Next.jsを使うなら最短ルート
 - **Netlify**: 一番老舗。Vercelより前からこのモデルを作った
 - **Cloudflare Pages**: 帯域無料・ネットワーク強力。コストとパフォーマンス重視ならアリ
-- **Azure Static Web Apps**: Microsoftの総合クラウドの一部。**Free tierで商用OK**（Vercel Hobbyより緩い）、エンプラ/社内環境縛りなら本命（[azure.md](../azure/azure.md) §6参照）
+- **Azure Static Web Apps**: Microsoftの総合クラウドの一部。**Free tierで商用OK**（Vercel Hobbyより緩い）、エンプラ/社内環境縛りなら本命（[azure.md](../04b_azure/azure.md) §6参照）
 
-> 📝 「**CDN 1個に、Build / Functions / Preview URL を全部生やしたもの**」というのが一番しっくりくる説明。Supabaseが「**Postgresに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」だったのと対になる構造（[supabase.md](../supabase/supabase.md) §14 / [azure.md](../azure/azure.md) §16 参照）。
+> 📝 「**CDN 1個に、Build / Functions / Preview URL を全部生やしたもの**」というのが一番しっくりくる説明。Supabaseが「**Postgresに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」だったのと対になる構造（[supabase.md](../03_supabase/supabase.md) §14 / [azure.md](../04b_azure/azure.md) §16 参照）。

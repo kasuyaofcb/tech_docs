@@ -329,7 +329,7 @@ flowchart TB
     Q1 -->|"伝統的RDB"| AS["🔵 <b>Azure SQL<br/>Database</b><br/>SQL Server系<br/>業務システムで一般的"]
     Q1 -->|"OSS Postgres"| PG["🟢 <b>Azure Database<br/>for PostgreSQL</b><br/>標準Postgres"]
     Q1 -->|"NoSQL / 多モデル"| CD["🟣 <b>Cosmos DB</b><br/>グローバル分散<br/>サーバーレス課金"]
-    Q1 -->|"BaaS全部入り<br/>(認証+RT+RLS)"| SB["🟢 <b>Supabase</b><br/>(Azure外)<br/>(参考: <a href='../supabase/supabase.md'>supabase.md</a>)"]
+    Q1 -->|"BaaS全部入り<br/>(認証+RT+RLS)"| SB["🟢 <b>Supabase</b><br/>(Azure外)<br/>(参考: <a href='../03_supabase/supabase.md'>supabase.md</a>)"]
     Q1 -->|"KV / キャッシュ"| RD["🔴 <b>Azure Cache<br/>for Redis</b><br/>セッション/キャッシュ"]
 
     style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
@@ -349,7 +349,7 @@ flowchart TB
 | **Supabase併用** | 認証+RLS+Realtime 一式同梱 | ◯ | △ |
 | **Cache for Redis** | セッション/キャッシュ用途 | △ | ◯ |
 
-> 📝 構成パターンの一例として、Supabase + Azure Static Web Apps は外部 DB と組み合わせる構成、Azure 内で完結させる場合は Azure SQL Database や PostgreSQL が選択肢になる。DB の基本概念は [supabase.md](../supabase/supabase.md) §4-5 を参照。
+> 📝 構成パターンの一例として、Supabase + Azure Static Web Apps は外部 DB と組み合わせる構成、Azure 内で完結させる場合は Azure SQL Database や PostgreSQL が選択肢になる。DB の基本概念は [supabase.md](../03_supabase/supabase.md) §4-5 を参照。
 
 ---
 
@@ -382,7 +382,7 @@ flowchart LR
 | ③ 承認制マージ | 1+人レビュー必須 | GitHub Branch protection / Azure DevOps Branch policies |
 | ④ 本番側保険 | フラグ・ロールバック・カナリア | **App Configuration**（Feature Flag）/ Slot swap / Traffic routing |
 
-> 📝 正確には「**main ブランチへのマージ＝本番**」であって、main に直接 push することは普通禁止する（Branch protection）。ブランチ運用の詳細は [git.md](../git/git.md) §4 を参照。
+> 📝 正確には「**main ブランチへのマージ＝本番**」であって、main に直接 push することは普通禁止する（Branch protection）。ブランチ運用の詳細は [git.md](../02_git/git.md) §4 を参照。
 
 ### 本番後でも戻せる: Rollback / Canary / Feature Flag
 
@@ -470,7 +470,7 @@ flowchart TB
 
 > 🚨 **`NEXT_PUBLIC_*` の罠**: Next.js の `NEXT_PUBLIC_*` 系は**ビルド時にコードへ埋め込まれる**。**SWA Configuration に入れても意味がない**（実行時にしか参照されないため）。必ず **GitHub Secrets** に登録し、ワークフローの `env:` で渡す。
 
-> 📝 環境変数の基本概念は [git.md](../git/git.md) §8 / [vercel.md](../vercel/vercel.md) §7 を参照。Vercel が「Production / Preview / Development」の3環境で**自動的に分けて持てる**のに対し、Azureでは **GitHub Environments**（Actionsの環境別シークレット）や **deployment slot 別の Configuration** を**自分で組む**必要がある。ここはVercelの方が一歩楽。
+> 📝 環境変数の基本概念は [git.md](../02_git/git.md) §8 / [vercel.md](../04a_vercel/vercel.md) §7 を参照。Vercel が「Production / Preview / Development」の3環境で**自動的に分けて持てる**のに対し、Azureでは **GitHub Environments**（Actionsの環境別シークレット）や **deployment slot 別の Configuration** を**自分で組む**必要がある。ここはVercelの方が一歩楽。
 
 ### Key Vault を挟むメリット
 
@@ -968,7 +968,7 @@ flowchart TB
 **3者は同じ層を競合する関係ではなく、それぞれカバーする範囲が異なる。**
 
 - **Vercel**: フロントエンドのデプロイ体験に注力。Next.js を運営する会社が提供。公開・運用が簡潔
-- **Supabase**: バックエンド（DB+認証+ファイル）を一式にまとめた BaaS。Postgres が軸（[supabase.md](../supabase/supabase.md) §14参照）
+- **Supabase**: バックエンド（DB+認証+ファイル）を一式にまとめた BaaS。Postgres が軸（[supabase.md](../03_supabase/supabase.md) §14参照）
 - **Azure**: 総合クラウド。何でも揃うが組み合わせが必要。**業務利用・組織内利用・規模拡大**の機能が充実
 
 利用シナリオの例:
@@ -987,4 +987,4 @@ flowchart TB
     style C3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-> 📝 Azure の位置づけは「**Compute / DB / Auth / DevOps を一通り揃えた総合クラウド**」。Supabase が「Postgres を中心にまとめた構成」、Vercel が「CDN を中心にまとめた構成」だったのに対し、Azure は各機能を**部品として並べる**形を取る。そのため**入り口の Static Web Apps から始めて、必要に応じて関連サービスを追加していく**形で利用するのが一つのパターン（[vercel.md](../vercel/vercel.md) §13 / [supabase.md](../supabase/supabase.md) §14 と対になる構造）。
+> 📝 Azure の位置づけは「**Compute / DB / Auth / DevOps を一通り揃えた総合クラウド**」。Supabase が「Postgres を中心にまとめた構成」、Vercel が「CDN を中心にまとめた構成」だったのに対し、Azure は各機能を**部品として並べる**形を取る。そのため**入り口の Static Web Apps から始めて、必要に応じて関連サービスを追加していく**形で利用するのが一つのパターン（[vercel.md](../04a_vercel/vercel.md) §13 / [supabase.md](../03_supabase/supabase.md) §14 と対になる構造）。

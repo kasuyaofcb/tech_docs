@@ -8,14 +8,17 @@
 
 ## 📚 資料一覧
 
-| トピック | 内容 | 資料 |
-| --- | --- | --- |
-| Git | バージョン管理の全体像（作業ディレクトリ → ステージング → ローカル → リモート） | [git/git.md](git/git.md) |
-| Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [supabase/supabase.md](supabase/supabase.md) |
-| Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [vercel/vercel.md](vercel/vercel.md) |
-| Azure | 総合クラウドの全体像（テナント/サブスク階層 / Static Web Apps / CI-CDの安全弁 / 個人開発→本格運用） | [azure/azure.md](azure/azure.md) |
-| Azure 環境構築手順 | アカウント開設→デプロイ完了までの一連の流れ（CI/CDは GH Actions / Azure Pipelines、DBは Supabase / Azure SQL / PostgreSQL から選択） | [azure/setup.md](azure/setup.md) |
+| # | トピック | 内容 | 資料 |
+| --- | --- | --- | --- |
+| 01 | **アプリリリース全体像** | **最初に読むやつ**。ローカル/Git/Supabase/Vercel/Azureがどう繋がるかの地図 | [01_app-release/app-release.md](01_app-release/app-release.md) |
+| 02 | Git | バージョン管理の全体像（作業ディレクトリ → ステージング → ローカル → リモート） | [02_git/git.md](02_git/git.md) |
+| 03 | Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [03_supabase/supabase.md](03_supabase/supabase.md) |
+| 04a | Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [04a_vercel/vercel.md](04a_vercel/vercel.md) |
+| 04b | Azure | 総合クラウドの全体像（テナント/サブスク階層 / Static Web Apps / CI-CDの安全弁 / 個人開発→本格運用） | [04b_azure/azure.md](04b_azure/azure.md) |
+| 04b' | Azure 環境構築手順 | アカウント開設→デプロイ完了までの一連の流れ（CI/CDは GH Actions / Azure Pipelines、DBは Supabase / Azure SQL / PostgreSQL から選択） | [04b_azure/setup.md](04b_azure/setup.md) |
 
+> 📖 **推奨学習順**: 01 → 02 → 03 → 04a または 04b（配信先は二者択一）
+>
 > 今後追加予定: Next.js / Docker / 認証まわり など
 
 ---

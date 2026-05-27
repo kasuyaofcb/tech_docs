@@ -152,7 +152,7 @@ flowchart LR
 | Vite + React | `npm create vite@latest` | 5分で雛形が立つ |
 | Next.js | `npx create-next-app@latest` | 本格運用に近い |
 
-> 🚨 **`.gitignore` を忘れない**: `.env*` `node_modules/` `.next/` `dist/` などを除外。[git.md §8](../git/git.md) 参照。Supabaseキーなどの秘密情報がリポジトリに乗らないようにする。
+> 🚨 **`.gitignore` を忘れない**: `.env*` `node_modules/` `.next/` `dist/` などを除外。[git.md §8](../02_git/git.md) 参照。Supabaseキーなどの秘密情報がリポジトリに乗らないようにする。
 
 > 📝 リポジトリは**Private**で問題なし。Azure SWA は Private リポにも対応していて Free tier の制限も変わらない。詳しくは [azure.md §13](azure.md) 参照。
 
@@ -389,9 +389,9 @@ flowchart LR
 | `NEXT_PUBLIC_SUPABASE_URL` | プロジェクトのURL | フロントOK |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (旧 `anon_key`) | 公開可能なAPIキー | フロントOK |
 
-> 🚨 `service_role` キーは**フロントに絶対置かない**。サーバー側専用。[supabase.md §12](../supabase/supabase.md) 参照。
+> 🚨 `service_role` キーは**フロントに絶対置かない**。サーバー側専用。[supabase.md §12](../03_supabase/supabase.md) 参照。
 
-> 📝 テーブル作成・RLS設定など Supabase 側の設計は [supabase.md §4-7](../supabase/supabase.md) 参照。本資料の射程外。
+> 📝 テーブル作成・RLS設定など Supabase 側の設計は [supabase.md §4-7](../03_supabase/supabase.md) 参照。本資料の射程外。
 
 ---
 
@@ -755,6 +755,6 @@ flowchart LR
 # 関連資料
 
 - [azure.md](azure.md) — Azure 全体像 (本資料の概念編)
-- [vercel.md](../vercel/vercel.md) — 比較対象の PaaS（CI/CD思想が同じ）
-- [supabase.md](../supabase/supabase.md) — DB側に Supabase を選ぶ場合の概念
-- [git.md](../git/git.md) — ブランチ運用・`.gitignore`・PR フロー
+- [vercel.md](../04a_vercel/vercel.md) — 比較対象の PaaS（CI/CD思想が同じ）
+- [supabase.md](../03_supabase/supabase.md) — DB側に Supabase を選ぶ場合の概念
+- [git.md](../02_git/git.md) — ブランチ運用・`.gitignore`・PR フロー

@@ -429,7 +429,7 @@ flowchart LR
 
 「外部APIを叩く」「決済の確定処理」「Webhookを受ける」など、**フロントに置きたくないロジック**はEdge Functions（Deno製）で書ける。
 
-> 📝 **サーバーレス関数**（Edge Functions）の正体: サーバーを常時起動せず、**呼ばれた瞬間だけ立ち上がって処理して消える**仕組み。常駐コストがゼロ。Vercelの「Functions」も同じ発想（[vercel.md](../vercel/vercel.md) §9参照）。**Webhook** = 「何かが起きたら別サービスに自動で電話する」仕組み。Stripeの決済完了通知などをEdge Functionsで受け取れる。
+> 📝 **サーバーレス関数**（Edge Functions）の正体: サーバーを常時起動せず、**呼ばれた瞬間だけ立ち上がって処理して消える**仕組み。常駐コストがゼロ。Vercelの「Functions」も同じ発想（[vercel.md](../04a_vercel/vercel.md) §9参照）。**Webhook** = 「何かが起きたら別サービスに自動で電話する」仕組み。Stripeの決済完了通知などをEdge Functionsで受け取れる。
 
 ```mermaid
 flowchart LR
@@ -495,7 +495,7 @@ flowchart LR
 | `supabase db push` | ローカルのマイグレーションを本番に適用 |
 | `supabase gen types typescript` | DBスキーマからTypeScript型を生成 |
 
-> 📝 イメージは [git.md](../git/git.md) と同じ。**ローカルで作って → 差分を記録 → リモートに反映**。コードだけでなく**DBスキーマもGit管理**するのがモダンな運用。
+> 📝 イメージは [git.md](../02_git/git.md) と同じ。**ローカルで作って → 差分を記録 → リモートに反映**。コードだけでなく**DBスキーマもGit管理**するのがモダンな運用。
 
 ---
 
@@ -530,9 +530,9 @@ flowchart LR
     style R2A fill:#fff,color:#000,stroke:#C0392B,stroke-width:2px
 ```
 
-> 🚨 `service_role` をGitにcommitしてしまったら、**そのキーは即座にSupabaseダッシュボードで再発行**。漏れたキーは取り戻せない。[git.md](../git/git.md) §8の `.gitignore` の話とセットで覚える。
+> 🚨 `service_role` をGitにcommitしてしまったら、**そのキーは即座にSupabaseダッシュボードで再発行**。漏れたキーは取り戻せない。[git.md](../02_git/git.md) §8の `.gitignore` の話とセットで覚える。
 
-APIキーの正しい保管場所は **環境変数**（[git.md](../git/git.md) §8 / [vercel.md](../vercel/vercel.md) §7参照）。コードに直接書かず、`.env`ファイルやデプロイ先の管理画面に置き、コードからは名前で呼び出す。
+APIキーの正しい保管場所は **環境変数**（[git.md](../02_git/git.md) §8 / [vercel.md](../04a_vercel/vercel.md) §7参照）。コードに直接書かず、`.env`ファイルやデプロイ先の管理画面に置き、コードからは名前で呼び出す。
 
 ---
 
@@ -591,4 +591,4 @@ flowchart TB
 - 「将来データをエクスポートして他のPostgresに引っ越し」も普通にできる
 - 既存のSQL知識・PostgresのナレッジがそのままSupabaseに通用する
 
-> 📝 「**Postgres 1個に、Auth/Storage/Realtime/Functions を全部生やしたもの**」というのが一番しっくりくる説明。Vercelが「**CDNに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」と対になる構造（[vercel.md](../vercel/vercel.md) §13 / [azure.md](../azure/azure.md) §16 参照）。Azureに寄せて作るなら、Supabaseの代わりに **Azure SQL Database / PostgreSQL / Cosmos DB** という選択肢があり、詳しくは [azure.md](../azure/azure.md) §7 を参照。
+> 📝 「**Postgres 1個に、Auth/Storage/Realtime/Functions を全部生やしたもの**」というのが一番しっくりくる説明。Vercelが「**CDNに全部生やしたもの**」、Azureが「**クラウドのデパートに全部並べたもの**」と対になる構造（[vercel.md](../04a_vercel/vercel.md) §13 / [azure.md](../04b_azure/azure.md) §16 参照）。Azureに寄せて作るなら、Supabaseの代わりに **Azure SQL Database / PostgreSQL / Cosmos DB** という選択肢があり、詳しくは [azure.md](../04b_azure/azure.md) §7 を参照。
