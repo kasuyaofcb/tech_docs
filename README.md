@@ -16,8 +16,9 @@
 | 04a | Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [04a_vercel/vercel.md](04a_vercel/vercel.md) |
 | 04b | Azure | 総合クラウドの全体像（テナント/サブスク階層 / Static Web Apps / CI-CDの安全弁 / 個人開発→本格運用） | [04b_azure/azure.md](04b_azure/azure.md) |
 | 04b' | Azure 環境構築手順 | アカウント開設→デプロイ完了までの一連の流れ（CI/CDは GH Actions / Azure Pipelines、DBは Supabase / Azure SQL / PostgreSQL から選択） | [04b_azure/setup.md](04b_azure/setup.md) |
+| 05 | スマホ開発ワークフロー | AIアシスタント × クラウドGit でスマホからコミット・push まで進める方法 | [05_mobile-workflow/mobile-workflow.md](05_mobile-workflow/mobile-workflow.md) |
 
-> 📖 **推奨学習順**: 01 → 02 → 03 → 04a または 04b（配信先は二者択一）
+> 📖 **推奨学習順**: 01 → 02 → 03 → 04a または 04b（配信先は二者択一）→ 05 (補足)
 >
 > 今後追加予定: Next.js / Docker / 認証まわり など
 
