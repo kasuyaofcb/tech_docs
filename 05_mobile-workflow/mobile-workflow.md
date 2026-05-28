@@ -91,11 +91,13 @@ flowchart TB
 
 ## 3. 必要な前提
 
+本資料では **Claude Code on the web** + **GitHub** の組み合わせを代表例として説明する (他の組み合わせは §4 参照)。
+
 ```mermaid
 flowchart LR
     P1["📱 スマホ<br/>(ブラウザが動けばOK)"] ~~~ P2["🌐 ブラウザ<br/>Chrome/Safari/<br/>Edge等"]
-    P2 ~~~ P3["🤖 AIアシスタント<br/>のアカウント"]
-    P3 ~~~ P4["📦 クラウドGit<br/>のアカウント"]
+    P2 ~~~ P3["🤖 Anthropic<br/>アカウント<br/>(Claude)"]
+    P3 ~~~ P4["📦 GitHub<br/>アカウント"]
     P4 ~~~ P5["📁 対象リポジトリ<br/>(Public/Privateとも可)"]
 
     style P1 fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -107,66 +109,66 @@ flowchart LR
 
 > 📝 専用アプリのインストールは**不要**。スマホ標準のブラウザだけで完結する。
 
+> 📝 Claude には無料プランと有料プランがあり、Claude Code on the web の利用範囲・トークン上限はプランによって異なる。継続的に使う場合は有料プランの利用が想定される。
+
 ---
 
-## 4. AIアシスタント側の選択肢
+## 4. Claude Code on the web の位置づけ
 
-リポジトリ連携機能を持つ Web 版 AI アシスタントは複数存在し、それぞれ名称や対応 Git ホストが異なる。
+本資料は **Claude Code on the web** (URL: `claude.ai/code`) を代表例として説明する。Anthropic 公式のブラウザ版で、Claude とのチャット形式の対話だけで GitHub リポジトリを読み・書き・コミット・push まで実行できる。
 
 ```mermaid
-flowchart TB
-    Q["🤖 どのAI<br/>アシスタント？"] ==> Q1{"優先したいもの"}
+flowchart LR
+    USER["📱 利用者"] ==>|"対話"| CLAUDE["🤖 Claude<br/>(claude.ai/code)"]
+    CLAUDE ==>|"リポ操作"| GH["📦 GitHub"]
+    GH -.->|"差分・URL返却"| CLAUDE
+    CLAUDE -.->|"結果表示"| USER
 
-    Q1 --> C1["🟪 <b>Claude (Anthropic)</b><br/>claude.ai/code<br/>= Claude Code on the web"]
-    Q1 --> C2["🟦 <b>ChatGPT (OpenAI)</b><br/>Codex<br/>(有料プラン対象)"]
-    Q1 --> C3["🟪 <b>GitHub Copilot<br/>Workspace</b><br/>(GitHub標準連携)"]
-    Q1 --> C4["🟧 <b>Gemini (Google)</b><br/>等の他選択肢"]
-
-    style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
-    style C1 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style C2 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style C3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style C4 fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style USER fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style CLAUDE fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style GH fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-| サービス | URL / 入口 | 特徴 |
-| --- | --- | --- |
-| **Claude Code on the web** | `claude.ai/code` | Anthropic公式。GitHubリポを直接対象にブランチ作成・編集・push まで実行 |
-| **ChatGPT Codex** | `chatgpt.com` の Codex 機能 | OpenAI公式。GitHub連携でリポジトリを sandbox にロード、編集・PR作成 |
-| **GitHub Copilot Workspace** | GitHub 内蔵 | Issue/PR から起動する GitHub の AI 機能 |
-| **その他 (Gemini Code Assist 等)** | 各社サービス | 機能仕様は各サービスのドキュメント参照 |
+| 項目 | 内容 |
+| --- | --- |
+| **入口** | `claude.ai/code` (ブラウザでアクセス) |
+| **必要なもの** | Anthropic アカウント + GitHub アカウント連携 |
+| **対象 Git ホスト** | GitHub (公開・非公開の両方) |
+| **できること** | リポジトリ読み込み・コード変更・ブランチ作成・コミット・push |
+| **PR / マージ** | GitHub 側で別途実行 (本資料の範囲外) |
 
-> 📝 サービスの**機能名や対応範囲は頻繁に更新**される。本資料では「**この種のサービスが選択肢として存在する**」という事実を示すに留め、具体的な機能比較は各サービスの公式ドキュメントを参照する。
+> 📝 **同種の選択肢**として、ChatGPT の Codex、GitHub Copilot Workspace、Gemini Code Assist などもある。本資料は Claude Code on the web を中心に書くが、考え方や注意点は他のサービスでも概ね適用できる。具体的な機能差は各サービスの公式ドキュメントを参照。
 
 ---
 
 ## 5. 典型的なワークフロー
 
-スマホブラウザから AI アシスタントを使い、ブランチ作成 → 編集 → push まで実行する流れ。
+スマホブラウザから `claude.ai/code` にアクセスし、対象 GitHub リポジトリに対して**壁打ち → 変更 → push**まで実行する流れ。
 
 ```mermaid
 sequenceDiagram
     participant U as 📱 利用者
-    participant A as 🤖 AIアシスタント
-    participant G as 📦 クラウドGit
+    participant C as 🤖 Claude<br/>(claude.ai/code)
+    participant G as 📦 GitHub
 
-    U->>A: ① 対象リポジトリを指定
-    A->>G: リポジトリの構造を読み込む
-    G->>A: ファイル一覧・コード内容
-    Note over U,A: ② 壁打ち / 改善案検討
-    U->>A: ③ 修正内容を依頼<br/>(言葉ベースで)
-    A->>A: コード変更を生成
-    A->>U: 変更内容のプレビュー
-    Note over U,A: ④ 利用者がレビュー
-    U->>A: 確認OK → 反映依頼
-    A->>G: ⑤ 新規ブランチ作成<br/>+ コミット + push
-    G->>A: push完了
-    A->>U: 完了通知 (ブランチURL)
-    Note over U: ⑥ 必要に応じて<br/>PR作成は別途
+    U->>C: ① ブラウザで claude.ai/code を開く
+    Note over U,C: 初回は Anthropic ログイン<br/>+ GitHub 連携の承認
+    U->>C: ② 対象リポジトリを選択
+    C->>G: リポジトリの構造を読み込む
+    G->>C: ファイル一覧・コード内容
+    Note over U,C: ③ 壁打ち / 改善案検討
+    U->>C: ④ 修正内容を依頼<br/>(言葉ベースで)
+    C->>C: コード変更を生成
+    C->>U: 変更内容のプレビュー
+    Note over U,C: ⑤ 利用者がレビュー
+    U->>C: 確認OK → 反映依頼
+    C->>G: ⑥ 新規ブランチ作成<br/>+ コミット + push
+    G->>C: push完了
+    C->>U: 完了通知 (ブランチURL)
+    Note over U: ⑦ 必要に応じて<br/>PR作成は GitHub 側で別途
 ```
 
-> 📝 **ブランチ運用**は [git.md §3〜§4](../02_git/git.md) と同じ考え方。スマホからは **featureブランチに push まで** をスコープにし、main へのマージは PR 経由で別途行うのが安全。
+> 📝 **ブランチ運用**は [git.md §3〜§4](../02_git/git.md) と同じ考え方。スマホからは **featureブランチに push まで** をスコープにし、main へのマージは PR 経由で別途行うのが安全。Claude Code on the web は**作業ごとにブランチを切る**動作が基本で、同じ対話内で複数の修正を依頼する場合も Claude 側でブランチを分けて push してくれることが多い (詳細挙動は公式ドキュメント参照)。
 
 ---
 
@@ -245,7 +247,8 @@ flowchart TB
     R --> R2["👁️ <b>AI生成コードは必ずレビュー</b><br/>意図と違う書き換えが発生しうる"]
     R --> R3["🌿 <b>main直 push は避ける</b><br/>featureブランチ経由が原則"]
     R --> R4["📏 <b>大規模変更は分割</b><br/>スマホでレビューできる範囲に"]
-    R --> R5["⏱️ <b>会話セッションの上限</b><br/>長時間連続作業はトークン消費が大きい"]
+    R --> R5["⏱️ <b>セッション/利用量の上限</b><br/>Claude プランの上限内で運用"]
+    R --> R6["🔑 <b>GitHub 連携の権限スコープ</b><br/>連携時の権限範囲を必要最小限に"]
 
     style R fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
     style R1 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
@@ -253,7 +256,12 @@ flowchart TB
     style R3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
     style R4 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
     style R5 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style R6 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
 ```
+
+> 📝 Claude Code on the web は対話ごとにトークンを消費し、プランによって**1日 / 1ヶ月の利用量上限**が定められている。スマホでの長時間連続作業は上限に当たりやすいため、**1セッション=1まとまった作業**として区切ると効率的。
+>
+> 🚨 **GitHub 連携時の権限スコープ**: 初回連携時に「すべてのリポジトリへのアクセス」と「特定のリポジトリのみ」が選択できる。**特定のリポジトリのみ**を選び、対象を明示的に限定するのが推奨。後から GitHub 設定 → Applications で範囲を変更可能。
 
 ### 秘密情報の取り扱い
 
