@@ -175,35 +175,39 @@ sequenceDiagram
 ## 6. スマホで完結する範囲 / 完結しない範囲
 
 ```mermaid
-flowchart TB
-    SCOPE["📱 スマホで完結する範囲"]
+flowchart LR
+    subgraph M["📱 スマホで完結する範囲"]
+        direction TB
+        Y1["✅ 壁打ち / 設計議論"]
+        Y2["✅ コード読み込み・理解"]
+        Y3["✅ 軽微な修正・typo・refactor"]
+        Y4["✅ コミット + push"]
+        Y5["✅ ドキュメント更新"]
+        Y1 ~~~ Y2 ~~~ Y3 ~~~ Y4 ~~~ Y5
+    end
 
-    SCOPE --> Y1["✅ 壁打ち / 設計議論"]
-    SCOPE --> Y2["✅ コード読み込み・理解"]
-    SCOPE --> Y3["✅ 軽微な修正・typo・refactor"]
-    SCOPE --> Y4["✅ コミット + push"]
-    SCOPE --> Y5["✅ ドキュメント更新"]
+    subgraph P["💻 PC で行うことが多い範囲"]
+        direction TB
+        N1["⚠️ 多ファイル横断の大規模変更"]
+        N2["⚠️ ローカルでの動作確認・デバッグ"]
+        N3["⚠️ 大量のテスト実行"]
+        N4["⚠️ コードレビュー (差分が大きい場合)"]
+        N5["⚠️ マージ判断 / PRレビュー (大規模)"]
+        N1 ~~~ N2 ~~~ N3 ~~~ N4 ~~~ N5
+    end
 
-    OUT["💻 PC で行うことが多い範囲"]
-
-    OUT --> N1["⚠️ 多ファイル横断の大規模変更"]
-    OUT --> N2["⚠️ ローカルでの動作確認・デバッグ"]
-    OUT --> N3["⚠️ 大量のテスト実行"]
-    OUT --> N4["⚠️ コードレビュー (差分が大きい場合)"]
-    OUT --> N5["⚠️ マージ判断 / PRレビュー (大規模)"]
-
-    style SCOPE fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style OUT fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style Y1 fill:#fff,color:#000,stroke:#27AE60
-    style Y2 fill:#fff,color:#000,stroke:#27AE60
-    style Y3 fill:#fff,color:#000,stroke:#27AE60
-    style Y4 fill:#fff,color:#000,stroke:#27AE60
-    style Y5 fill:#fff,color:#000,stroke:#27AE60
-    style N1 fill:#fff,color:#000,stroke:#3498DB
-    style N2 fill:#fff,color:#000,stroke:#3498DB
-    style N3 fill:#fff,color:#000,stroke:#3498DB
-    style N4 fill:#fff,color:#000,stroke:#3498DB
-    style N5 fill:#fff,color:#000,stroke:#3498DB
+    style M fill:#E8F8E8,stroke:#27AE60,stroke-width:3px,color:#000
+    style P fill:#E5F1FB,stroke:#3498DB,stroke-width:3px,color:#000
+    style Y1 fill:#fff,color:#000,stroke:#27AE60,stroke-width:2px
+    style Y2 fill:#fff,color:#000,stroke:#27AE60,stroke-width:2px
+    style Y3 fill:#fff,color:#000,stroke:#27AE60,stroke-width:2px
+    style Y4 fill:#fff,color:#000,stroke:#27AE60,stroke-width:2px
+    style Y5 fill:#fff,color:#000,stroke:#27AE60,stroke-width:2px
+    style N1 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
+    style N2 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
+    style N3 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
+    style N4 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
+    style N5 fill:#fff,color:#000,stroke:#3498DB,stroke-width:2px
 ```
 
 > 📝 「**スマホで何でもできる**」と思い込まないことが重要。AIアシスタントは指示通りにコードを生成するが、**生成結果の正しさ・本番影響の判断は利用者の責任**。狭い画面で多ファイル差分を読むのは認知負荷が高く、見落としが発生しやすい。
