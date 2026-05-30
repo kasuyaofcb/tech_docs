@@ -254,13 +254,13 @@ GitHub を使わない / Azure 内でリポジトリと CI/CD を完結させる
 
 ```mermaid
 flowchart LR
-    S1["①<br/>dev.azure.com<br/>Organization作成"] ==> S2["②<br/>Project作成<br/>(Reposも自動付帯)"]
+    S1["①<br/>aex.dev.azure.com<br/>Organization作成"] ==> S2["②<br/>Project作成<br/>+ PAT発行"]
     S2 ==> S3["③<br/>ローカルリポを<br/>Azure Reposへpush"]
-    S3 ==> S4["④<br/>Portalで<br/>SWA作成<br/>'デプロイのソース: その他'"]
+    S3 ==> S4["④<br/>SWA準備<br/>(新規 or 既存流用)"]
     S4 ==> S5["⑤<br/>deployment token<br/>取得"]
-    S5 ==> S6["⑥<br/>azure-pipelines.yml<br/>作成"]
-    S6 ==> S7["⑦<br/>Service Connection<br/>+ Variable Group登録"]
-    S7 ==> S8["✅<br/>Pipelines実行<br/>→ デプロイ完了"]
+    S5 ==> S6["⑥<br/>azure-pipelines.yml<br/>を commit & push"]
+    S6 ==> S7["⑦<br/>Pipeline作成<br/>+ token を Variable 登録"]
+    S7 ==> S8["✅<br/>初回実行<br/>→ デプロイ完了"]
 
     style S1 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -272,70 +272,178 @@ flowchart LR
     style S8 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
-### Step ① Organization と Project 作成
+### Step ① Organization 作成
 
-- `dev.azure.com` にアクセス（Portalと同じMicrosoftアカウントでサインイン）
-- 初回は「Create new organization」→ 組織名（例: `my-company`）と地域を選ぶ
-- 続けて「New Project」→ プロジェクト名（例: `my-app`）→ Visibility: Private → Create
+Azure DevOps は `dev.azure.com` にホストされる。
 
-### Step ② Azure Repos にコード移送
+- ブラウザで **`https://aex.dev.azure.com/`** にアクセス（Portal と同じ Microsoft アカウントでサインイン）
+- 初回は「Create new organization」のフローに入る
+- 既存セッションありで `dev.azure.com` に飛ぶと `portal.azure.com` にリダイレクトされる場合があるため、上記の `aex.dev.azure.com` を直接叩くのが確実
 
-| 状況 | 操作 |
+**入力内容:**
+
+| 項目 | 入れる値 |
 | --- | --- |
-| まだ何もリポジトリがない | プロジェクト → Repos → ローカルから `git remote add origin ...` で push |
-| GitHub からコピーしたい | プロジェクト → Repos → Import → GitHub URL を貼る |
+| Organization 名 | URL の一部になる（例: `my-org`）。後から rename も可能 |
+| ホスティングリージョン | **地域単位**で選ぶ（後述の罠を参照） |
+| 課金サブスクリプション | 既存の Azure サブスクリプションを選択（Free 枠内なら課金なし） |
 
-> 📝 Azure Repos の URL は `https://dev.azure.com/{org}/{project}/_git/{repo}` の形。Personal Access Token (PAT) を発行して認証する。
+> 🚨 **リージョン選択の罠**: Azure 本体は「Japan East」「East Asia」のような国単位だが、**Azure DevOps の選択肢は地域単位**（例: `Asia Pacific`、`Australia East`、`East US` 等）。日本向けには **Asia Pacific** を選ぶ（実体はシンガポール or 香港のデータセンター）。日本ラベルが出ないので「設定ミス?」と詰まりやすい。
+>
+> 📝 Azure DevOps の Free tier: Private リポ無制限 / Pipelines 1,800分/月 / ユーザー5人まで無料。個人〜小規模なら課金されない。
 
-### Step ③ SWA を「ソースなし」で作る
+### Step ② Project 作成 + PAT 発行
+
+#### Project 作成
+
+Organization 作成完了後、自動で Project 作成画面に進む（または左メニュー「+ New Project」）。
+
+| 項目 | 入れる値 |
+| --- | --- |
+| Project name | `my-app` など |
+| Visibility | Private（個人検証なら推奨） |
+| Version control | Git |
+| Work item process | Basic（最もシンプル） |
+
+#### PAT (Personal Access Token) 発行
+
+Azure Repos への git push は **Personal Access Token** が必須。発行手順:
 
 ```mermaid
 flowchart LR
-    A["Portalで<br/>SWA作成画面"] ==>|"基本タブ"| B["プラン: Free<br/>リージョン: East Asia"]
-    B ==>|"デプロイの詳細"| C["⚠️ ソースを<br/>'<b>その他</b>' に"]
-    C ==> D["確認と作成 → 作成<br/>(GitHubAS連携なし)"]
+    A["右上ユーザーアイコン"] ==> B["Personal access tokens"]
+    B ==> C["+ New Token"]
+    C ==> D["Name / Expiration<br/>を設定"]
+    D ==> E["Scopes:<br/><b>Code</b> → Read & write"]
+    E ==> F["Create"]
+    F ==> G["⚠️ 表示トークンを<br/>必ずコピー<br/>(再表示不可)"]
 
     style A fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style B fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style C fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style D fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style B fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style C fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style D fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
+    style F fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style G fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
-ここで GitHub と紐づけず、**自前の Pipelines からデプロイ**する状態にする。
+> 🚨 **トークンは表示画面を閉じると再表示できない**。コピーし忘れた場合は新しいトークンを作り直す。
+>
+> 📝 Scope を「Code (Read & write)」だけに絞れば、誤って広範な権限を渡すリスクが減る。
 
-### Step ④ Deployment Token を取得
+### Step ③ Azure Repos にコード移送
 
-- Portal → 作った SWA → 概要 → 右上「**デプロイトークンの管理**」
-- 表示されたトークンをコピー（一度しか出ない）
+3パターンから状況に応じて選ぶ:
 
-### Step ⑤ azure-pipelines.yml を作る
+```mermaid
+flowchart TB
+    Q["📦 コード移送"] ==> Q1{"既存リポはどこにある？"}
 
-リポジトリのルートに `azure-pipelines.yml` を作成。最低限の構造:
+    Q1 -->|"ローカルのみ"| P1["✅ ローカルから直接 push<br/>git remote add origin <Azure Repos URL><br/>git push -u origin main"]
+    Q1 -->|"GitHubに既存"| P2["✅ Azure DevOps の<br/><b>Import repository</b> を使う<br/>(GitHub URLを貼る)"]
+    Q1 -->|"GitHubと並行運用したい"| P3["✅ remote を2つ持つ<br/>git remote add azure <Azure Repos URL><br/>git push azure main"]
 
-| 要素 | 役割 |
+    style Q fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style Q1 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
+    style P1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P2 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style P3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+```
+
+- Azure Repos の URL: `https://{org}@dev.azure.com/{org}/{project}/_git/{repo}` 形式
+- push 時に認証ダイアログが出るので **PAT をパスワード欄に貼り付ける**（Username は任意の文字列でOK）
+- 1度成功すれば macOS Keychain / Windows Credential Manager に保存され、以降は自動
+
+### Step ④ SWA を準備 (新規 or 既存流用)
+
+**2 パターンとも、認証はトークン1個で済む**。
+
+| パターン | 内容 | こんな時 |
+| --- | --- | --- |
+| **A. 既存 SWA を流用** | 既に動いている SWA リソースを Azure DevOps から追加デプロイ | GitHub Actions + Azure DevOps の並行運用 / 移行リハーサル |
+| **B. SWA を新規作成 (ソースなし)** | Portal → Static Web Apps → 作成 → 「デプロイのソース」を **その他** にして CI/CD 未連携で作る | Azure DevOps だけで運用する場合 |
+
+> 📝 **同じ SWA リソース**に対して GitHub Actions と Azure Pipelines の**両方が同時にデプロイ可能**。トークンが同じため、両方の YAML が動いていてもどちらか直近の push が反映される動作になる。
+
+### Step ⑤ Deployment Token を取得
+
+- Portal → 対象 SWA → 概要 → 右上「**デプロイトークンの管理**」
+- 表示されたトークンをコピー
+- 紛失しても**再取得は可能**（GitHub Actions 連携で使われているトークンと同一）
+
+### Step ⑥ azure-pipelines.yml を作る
+
+リポジトリのルートに `azure-pipelines.yml` を作成・commit・push する。
+
+最低限の構造:
+
+| 要素 | 役割 | 値の例 |
+| --- | --- | --- |
+| `trigger:` | どのブランチへの push でビルドするか | `main` |
+| `pr:` | どのブランチへの PR でビルドするか | `main` |
+| `pool: vmImage:` | Microsoft-hosted Agent 指定 | `ubuntu-latest` |
+| `steps:` + `task: AzureStaticWebApp@0` | Microsoft 公式の SWA デプロイタスク | — |
+| タスクの入力 | `app_location` / `api_location` / `output_location` | プロジェクト構成に応じて |
+| トークン参照 | `azure_static_web_apps_api_token: $(変数名)` | Step ⑦ で登録する変数名 |
+
+> 📝 Microsoft Learn の「Azure Pipelines を使用してデプロイする」ページに**公式テンプレート**あり。GitHub Actions の `azure-static-web-apps-xxxx.yml` と概念は1対1対応（[azure.md §11.2](azure.md) 参照）。
+>
+> 📝 `app_location` / `api_location` / `output_location` の値は **GitHub Actions の YAML と同じ値**を使えば動く。例: Next.js 静的出力なら `app_location: /` / `output_location: out`、Functions API が `api/` にあるなら `api_location: api`。
+
+### Step ⑦ Pipeline 作成 + Token を Variable 登録
+
+```mermaid
+flowchart LR
+    S1["①<br/>Pipelines →<br/>Create Pipeline"] ==> S2["②<br/>'Azure Repos Git'<br/>→ リポジトリ選択"]
+    S2 ==> S3["③<br/>'Existing YAML'<br/>→ /azure-pipelines.yml"]
+    S3 ==> S4["④<br/>Review画面右上<br/><b>Variables</b> ボタン"]
+    S4 ==> S5["⑤<br/>+ New variable<br/>Name + Value + 🔒 Secret"]
+    S5 ==> S6["⑥<br/>Save and run<br/>→ 初回実行"]
+
+    style S1 fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S4 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style S5 fill:#E67E22,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S6 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+**Variable 登録の詳細 (⑤):**
+
+| 項目 | 入れる値 |
 | --- | --- |
-| `trigger:` | どのブランチへの push でビルドするか |
-| `pool: vmImage:` | Microsoft-hosted Agent 指定（例: `ubuntu-latest`）|
-| `steps:` | npm install → build → デプロイの順 |
-| `task: AzureStaticWebApp@0` | Microsoft 公式の SWA デプロイタスク |
+| Name | `AZURE_STATIC_WEB_APPS_API_TOKEN`（YAML 内の `$(変数名)` と完全一致） |
+| Value | Step ⑤ でコピーしたトークン |
+| Keep this value secret | ✅ チェック必須 |
 
-> 📝 Microsoft Learn の「Azure Pipelines を使用してデプロイする」ページに公式テンプレートあり。GitHub Actions の `azure-static-web-apps-xxxx.yml` と構造は1対1対応（[azure.md §11.2](azure.md) 参照）。
+> 📝 **Variable Group vs Pipeline 直接登録**: 単一の Pipeline で使うだけなら上記の**Pipeline 直接登録**で十分。複数 Pipeline でトークンを共有したい場合は **Library → Variable group** で登録し、`azure-pipelines.yml` の `variables:` セクションから `- group: グループ名` で参照する形に切り替える。
+>
+> 📝 **閉域ネットワーク要件**で Microsoft-hosted Agent が使えない場合は、`pool:` を `pool: name: <自前エージェントプール名>` に変えて、別途 Self-hosted Agent を組織内VMにインストールする。Agent はアウトバウンドのみで Pipelines と通信するためファイアウォールを開ける必要はない（[azure.md §11.3](azure.md) 参照）。
 
-### Step ⑥ Variable Group に Deployment Token を登録
+### 並行運用パターン: GitHub と Azure DevOps の両方を残す
 
-- Azure DevOps → Pipelines → Library → + Variable group
-- 名前: `swa-secrets` など
-- 変数追加: `AZURE_STATIC_WEB_APPS_API_TOKEN` = 先ほどのトークン
-- 🔒 マークをONにして秘匿化
+GitHub Actions と Azure Pipelines を**両方稼働させて同じ SWA にデプロイ**する構成は、以下の用途で実用的:
 
-### Step ⑦ Pipeline 作成と初回実行
+```mermaid
+flowchart LR
+    L["📁 ローカルリポ"] ==>|"git push origin"| GH["🟪 GitHub"]
+    L ==>|"git push azure"| AR["🟦 Azure Repos"]
+    GH ==>|"GitHub Actions"| SWA["🔷 同一 SWA<br/>(同じデプロイトークン)"]
+    AR ==>|"Azure Pipelines"| SWA
 
-- Pipelines → Create Pipeline → Azure Repos Git → 対象リポジトリ
-- 既存 YAML を使う → ブランチ `main`、パス `/azure-pipelines.yml`
-- Variable group を紐付け
-- Run pipeline → ビルド成功 → SWA に反映
+    style L fill:#FF8C42,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style GH fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style AR fill:#0078D4,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style SWA fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
 
-> 📝 **閉域ネットワーク要件**で Microsoft-hosted Agent が使えない場合は、Step ⑦ の `pool:` を `pool: name: <自前エージェントプール名>` に変えて、別途 Self-hosted Agent を組織内VMにインストールする。Agent はアウトバウンドのみで Pipelines と通信するためファイアウォールを開ける必要はない（[azure.md §11.3](azure.md) 参照）。
+| 用途 | 説明 |
+| --- | --- |
+| 移行リハーサル | GitHub Actions を残したまま Azure DevOps の動作を試せる |
+| 学習・比較 | 同じ処理を 2 つの CI/CD 基盤で動かして差分を体感する |
+| 冗長化 | 片方の CI/CD が障害でも、もう片方からデプロイ継続可能 |
+
+> 📝 移行のリハーサルとして「**GitHub Actions で稼働中のものを保ったまま Azure Pipelines を追加し、動作確認できたら GitHub Actions 側を停止**」という段階的な切替が安全。
 
 ---
 
