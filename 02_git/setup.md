@@ -498,17 +498,26 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 | 項目 | 入れる値 |
 | --- | --- |
 | Token name | **使う場所が分かる名前**（`macbook-cursor` など） |
-| Expiration | **No expiration（無期限）** |
+| Expiration | **90日（おすすめ）**／`No expiration`（無期限）も選べる |
 | Repository access | **All repositories** |
 | Permissions → Contents | **Read and write**（これだけ） |
 
-> 📝 **Expiration は無期限にしておく。** 期限が切れると、ある日とつぜん `git push` だけが通らなくなり、原因探しから始まることになる。**学習用途では、切れて詰まるコストのほうが大きい。**
+**Expiration の選び方:**
 
-> 📝 **Repository access も All repositories でよい。** Only select にすると、**新しくリポジトリを作るたびにトークンの設定を変えに行く**ことになり、そのたびに push が止まる。
+| 選択 | 向いている場面 | 代償 |
+| --- | --- | --- |
+| 🟢 **90日（おすすめ）** | ふだんの学習・個人開発 | 90日ごとに作り直す（2分） |
+| ⚠️ `No expiration` | 作り直す手間を絶対に避けたい | **漏れたら、自分で消すまで永久に有効** |
+
+> 🟢 **期限を切るのをすすめる理由はひとつ。** トークンは、うっかりコードに書いてしまったり、画面共有に映ったりして漏れることがある。**期限があれば、漏れたことに気づかないままでも、いつかは自然に無効になる。** 無期限だと、使える鍵が外に出たままになる。
+
+> 📝 **期限切れは、知っていれば怖くない。** 切れたときに起きるのは `fatal: Authentication failed for 'https://github.com/...'` が出て `git push` が止まることだけで、**壊れたわけでも、履歴が消えたわけでもない。** 同じ手順で作り直せば2分で戻る。期限が近づくと GitHub からメールも届く。
+
+> 📝 **Repository access は All repositories でよい。** Only select にすると、**新しくリポジトリを作るたびにトークンの設定を変えに行く**ことになり、そのたびに push が止まる。
 
 > 🚨 **そのかわり、Permissions は必要な1つだけにする。** `Contents: Read and write` だけ付けておけば、仮に漏れても**ファイルの読み書き**までで止まる。⛔ Administration（リポジトリの削除）や Secrets には触らせない。
 
-> 🚨 **無期限 × 全リポジトリなので、漏れたときの影響は大きい。** 漏らしたかもしれないと思ったら、すぐ **Settings → Developer settings → Fine-grained tokens** から **Delete** する。**消せばその瞬間に無効**になるので、気づいたら消すのが唯一で確実な対処。Token name を使う場所の名前にしておくと、どれを消せばよいかが分かる。
+> 🚨 **漏らしたかもしれないと思ったら、すぐ Delete する。** **Settings → Developer settings → Fine-grained tokens** から消せば、**その瞬間に無効**になる。期限を待つ必要はない。Token name を使う場所の名前にしておくと、どれを消せばよいかが分かる。
 
 🚨 **表示されたトークンは一度しか見られない。** その場でパスワードマネージャーに保存する。
 
@@ -516,7 +525,7 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 > 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は `repo` にチェックを入れた時点で、コードの読み書きだけでなく**リポジトリの削除・設定変更・Webhook まで全部できる**トークンになる。fine-grained なら `Contents` だけに絞れる。
 > 🚨 **トークンを `.env` やコードに書かない。** 一度 commit すると履歴に残り続ける。
 
-> 📝 **`No expiration` が選べないときは、一番長いものを選ぶ。** 会社や学校のアカウントだと、組織のポリシーで上限が決まっていることがある。
+> 📝 **会社や学校のアカウントだと、期限の上限が組織のポリシーで決まっていることがある。** `No expiration` が出てこない場合はそれが理由。選べるなかで一番長いものを選ぶ。
 
 push 時に聞かれたら、Username は GitHub のユーザー名、**Password の欄にトークンを貼る**。
 
@@ -573,6 +582,7 @@ git push -u origin main
 | 出たメッセージ | 原因 | 対処 |
 | --- | --- | --- |
 | `Support for password authentication was removed` | パスワードを入れている | 2.2 の認証をやる |
+| `fatal: Authentication failed for 'https://github.com/...'` | 🔴 **トークンの期限切れ**、または値が違う | 2.2 🅲 で作り直す（2分）。**履歴は無事なので慌てない** |
 | `remote origin already exists` | すでに origin が登録されている | `git remote set-url origin <新しいURL>` |
 | `src refspec main does not match any` | コミットが1つもない | 1.4 の `git commit` を先にやる |
 | `failed to push some refs` / `fetch first` | GitHub 側に自分が持っていないコミットがある | `git pull --rebase origin main` → もう一度 push |
