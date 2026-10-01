@@ -265,16 +265,22 @@ git config --global --list
 
 ## 1.4 最初のコミット
 
-### ① フォルダを開く — `cd` は打たない
+🟢 **ここからは練習用のフォルダ `git-practice` で進める。** 本物のプロジェクトを壊す心配がなく、画面もこの手順書と同じになる。**本番のプロジェクトでは、同じ手順をそのフォルダでもう一度やるだけ。**
 
-🚨 **Cursor で「作業したいフォルダ」を開いていれば、ターミナルは最初からそのフォルダにいる。** 移動のコマンドは要らない。
+### ① 練習用フォルダを作って開く — `cd` は打たない
 
 | | やること |
 | --- | --- |
-| フォルダが無い人 | 先にデスクトップなどに**新しいフォルダを1つ作る**（名前は `my-app` など半角英数字で） |
-| 開き方 | Cursor 上部メニューの **ファイル** → **フォルダを開く**（英語表示なら **File** → **Open Folder**）→ そのフォルダを選ぶ |
+| 作る | デスクトップに**新しいフォルダを作り、名前を `git-practice` にする**（Finder で右クリック → **新規フォルダ**） |
+| 開く | Cursor 上部メニューの **ファイル** → **フォルダを開く**（英語表示なら **File** → **Open Folder**）→ `git-practice` を選ぶ |
 
-> 🚨 **「このフォルダー内のファイルの作成者を信頼しますか？」と聞かれる。** 初めて開くフォルダでは必ず出る。**自分で作ったフォルダなので「はい、作成者を信頼します」を選ぶ**（英語表示なら **Yes, I trust the authors**）。
+![git-practice を開いた直後の Cursor](images/folder-opened.png)
+
+→ 左上に **`GIT-PRACTICE`** と出ていれば開けている。中身はまだ空。
+
+🚨 **Cursor でフォルダを開いていれば、ターミナルは最初からそのフォルダにいる。** 移動のコマンド（`cd`）は要らない。
+
+> 📝 **「このフォルダー内のファイルの作成者を信頼しますか？」と聞かれることがある。** Cursor の設定によっては出ない。出たら、**自分で作ったフォルダなので「はい、作成者を信頼します」を選ぶ**（英語表示なら **Yes, I trust the authors**）。
 
 フォルダを開いたら、**ターミナルを開き直す。**
 
@@ -289,7 +295,7 @@ git config --global --list
 pwd
 ```
 
-→ **自分のプロジェクトのフォルダ名で終わっていればOK。**
+→ **`/git-practice` で終わっていればOK**（例: `/Users/あなたの名前/Desktop/git-practice`）。
 
 > 🚨 **ここが違うと、関係ないフォルダの履歴を取り始める。** `/Users/あなたの名前` で終わっていたら、フォルダを開けていないか、ターミナルを開き直していない。
 
@@ -312,13 +318,17 @@ node_modules/
 | `node_modules/` | ライブラリの置き場。数万ファイルあり、記録する意味がない（`npm install` で作り直せる） |
 | `.DS_Store` | Mac が勝手に作る管理ファイル |
 
-🚨 **貼ったら `Cmd` + `S`（Windows は `Ctrl` + `S`）で保存する。** タブのファイル名の横に `●` が出ている間は、まだ保存されていない。
+![.gitignore に4行を貼った直後（保存前）](images/gitignore-unsaved.png)
+
+🚨 **貼ったら `Cmd` + `S`（Windows は `Ctrl` + `S`）で保存する。** 上の画像のように、タブの `.gitignore` の横に `●` が出ている間は、まだ保存されていない。
+
+> 📝 **5行目に薄い文字（上の画像では `.cursorrules`）が出ることがある。** Cursor の AI が「次はこれでは？」と出している**候補**で、まだ書かれていない。`Tab` を押さなければ入らないので、無視して保存してよい。
 
 > 🚨 **一度 `commit` したファイルは、あとから `.gitignore` に書いても記録され続ける。** だから `git add` より先に作る。
 
 ### ③ 練習用のファイルを1つ作る
 
-新しく作ったフォルダだと、中身は `.gitignore` だけ。これでは 1.5 で「戻す」練習ができないので、**ふつうのファイルを1つ作っておく。**
+いまの中身は `.gitignore` だけ。これでは 1.5 で「戻す」練習ができないので、**ふつうのファイルを1つ作っておく。**
 
 ② と同じやり方で `memo.txt` を作り、中に1行書いて**保存**する。
 
@@ -326,7 +336,9 @@ node_modules/
 はじめてのGit
 ```
 
-> 📝 **もとからファイルが入っているフォルダなら、③ は飛ばしてよい。** 1.5 の練習は、そのファイルで代わりにできる。
+![.gitignore と memo.txt を作って保存した状態](images/files-created.png)
+
+→ 左のファイル一覧に **`.gitignore` と `memo.txt` の2つ**が並んでいればOK。
 
 ### ④ 履歴を取り始める
 
@@ -342,7 +354,13 @@ git init
 git status
 ```
 
+![git init と git status を打った直後](images/git-status-first.png)
+
+→ `Untracked files:` の下に **`.gitignore` と `memo.txt` の2つだけ**が赤字で出ていればOK。
+
 > 🚨 **ここに `.env` が出てきたら、② をやり直す。** `.gitignore` に書けていない。
+
+> 📝 **左のファイル一覧に緑の `U` が付く。** Untracked（まだ記録していない）の頭文字。コミットすると消える。
 
 ```sh
 git add .
@@ -358,7 +376,7 @@ git commit -m "最初のコミット"
 git log --oneline
 ```
 
-→ `a1b2c3d 最初のコミット` のように出れば成功。
+→ `10a8d6c (HEAD -> main) 最初のコミット` のように出れば成功（先頭の7文字は人によって違う）。
 
 | コマンド | 意味 |
 | --- | --- |
@@ -410,19 +428,49 @@ git restore .
 
 - [ ] `git --version` でバージョンが出る
 - [ ] `git config --global --list` に `user.name` と `user.email` と `init.defaultbranch=main` がある
-- [ ] `pwd` が自分のプロジェクトのフォルダを指している
+- [ ] `pwd` が `/git-practice` で終わる
 - [ ] `git status` に `.env` が出てこない
 - [ ] `git log --oneline` にコミットが1つ以上出る
 
 **最後に、戻せることを1回だけ試す:**
 
-1. 1.4 の ③ で作った `memo.txt` を開いて、**消えても困らない1行**を足して保存する
-2. `git diff` → その1行が出る
-3. `git restore .` → 足した1行が消えて、元に戻る
+1. 1.4 の ③ で作った `memo.txt` を開き、2行目にこれを足して保存する（`Cmd` + `S`）
+
+```text
+消えても困らない行
+```
+
+2. ターミナルで差分を見る
+
+```sh
+git diff
+```
+
+![memo.txt に1行足して git diff を打った直後](images/git-diff.png)
+
+→ 最後に緑の **`+消えても困らない行`** が出ればOK。`+` は「足された行」の印。左の一覧の `memo.txt` には、Modified（変更あり）の **`M`** が付く。
+
+3. 編集を捨てて戻す
+
+```sh
+git restore .
+```
+
+→ `memo.txt` の2行目が消えて、`はじめてのGit` だけに戻ればOK。
 
 > 🚨 **この練習は、保存していない大事な編集が無い状態でやる。** `git restore .` は、まだ `commit` していない編集を**すべて**消す。
 
-**ここまでできたら、GitHub は後回しでよい。**
+**🎉 Part 1 のゴール — こうなっていれば完了:**
+
+![Part 1 のゴール：ファイル2つと「最初のコミット」](images/part1-goal.png)
+
+| 見るところ | こうなっていればOK |
+| --- | --- |
+| 左のファイル一覧 | `.gitignore` と `memo.txt` の2つ。`U` や `M` が付いていない |
+| ターミナルの最後 | `git log --oneline` の結果に `最初のコミット` |
+| 左下のステータスバー | `main` と出ている（1.3 の3つ目の設定が効いている） |
+
+**ここまでできたら、GitHub は後回しでよい。** 本番のプロジェクトでは、1.4 の ① で開くフォルダを変えて、② と ④ を同じようにやる（③ の `memo.txt` は練習用なので要らない）。
 
 ---
 
@@ -530,13 +578,29 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 
 ## 2.3 リポジトリを作って push
 
+🟢 **Part 1 で作った `git-practice` をそのまま GitHub に上げる。** Cursor で `git-practice` を開いたまま、ターミナルで進める。
+
 **GitHub CLI があるなら1行で済む:**
 
 ```sh
-gh repo create my-app --private --source=. --remote=origin --push
+gh repo create git-practice --private --source=. --remote=origin --push
 ```
 
-**手でやる場合:** まず GitHub 上で**空の**リポジトリを作る（**README にチェックを入れない**）。そのあと**1行ずつ**貼る。
+| 部分 | 意味 |
+| --- | --- |
+| `git-practice` | GitHub 上のリポジトリ名（フォルダ名と同じにしておくと迷わない） |
+| `--private` | 自分だけが見られる設定 |
+| `--source=.` | いまいるフォルダを上げる |
+| `--remote=origin` | GitHub 側に `origin` という呼び名を付ける |
+| `--push` | 作ったらすぐ push する |
+
+→ 最後に `✓ Pushed commits to https://github.com/...` と出れば成功。ブラウザで確かめるなら、これを貼って Enter（GitHub のリポジトリ画面が開く）:
+
+```sh
+gh repo view --web
+```
+
+**手でやる場合:** まず GitHub 上で `git-practice` という名前の**空の**リポジトリを作る（**README にチェックを入れない**）。そのあと**1行ずつ**貼る。
 
 ```sh
 git remote add origin https://github.com/<ユーザー名>/<リポジトリ名>.git
@@ -561,9 +625,25 @@ git push -u origin main
 ### ✅ Part 2 のチェック
 
 - [ ] `gh auth status` が通る（または初回 push が成功した）
-- [ ] ブラウザで自分のリポジトリにファイルが見える
-- [ ] 適当に1行変えて `commit` → `push` が通る
+- [ ] `gh repo view --web` でブラウザが開き、`.gitignore` と `memo.txt` が見える
+- [ ] リポジトリ名の横に **`Private`** と出ている
+- [ ] `memo.txt` に1行足して `git add .` → `git commit -m "メモを追記"` → `git push` が通る
 - [ ] GitHub 上でそのコミットが**自分のアイコン付き**で出ている
+
+**🎉 Part 2 のゴール — こうなっていれば完了:**
+
+![Part 2 のゴール：GitHub の git-practice リポジトリ](images/part2-goal.png)
+
+（灰色で塗った部分には、自分のユーザー名とアイコンが出る）
+
+| 見るところ | こうなっていればOK |
+| --- | --- |
+| リポジトリ名の横 | **`Private`** |
+| ファイル一覧 | `.gitignore` と `memo.txt` |
+| 一覧の上の行 | 自分のアイコン ＋ ユーザー名 ＋ コミットメッセージ（`最初のコミット`） |
+| 右下の Contributors | 自分が1人。**アイコンが出ていなければ 1.3 の `user.email` が GitHub と違う** |
+
+> 📝 **`Add a README` のボタンは押さなくてよい。** README は「このリポジトリの説明書き」で、練習には要らない。
 
 ---
 
