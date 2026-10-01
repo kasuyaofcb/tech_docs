@@ -497,16 +497,26 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 
 | 項目 | 入れる値 |
 | --- | --- |
-| Token name | 用途がわかる名前（`macbook-push` など） |
-| Expiration | 90日（長すぎるものを作らない） |
-| Repository access | Only select repositories → 対象のリポジトリ |
-| Permissions → Contents | **Read and write** |
+| Token name | **使う場所が分かる名前**（`macbook-cursor` など） |
+| Expiration | **No expiration（無期限）** |
+| Repository access | **All repositories** |
+| Permissions → Contents | **Read and write**（これだけ） |
+
+> 📝 **Expiration は無期限にしておく。** 期限が切れると、ある日とつぜん `git push` だけが通らなくなり、原因探しから始まることになる。**学習用途では、切れて詰まるコストのほうが大きい。**
+
+> 📝 **Repository access も All repositories でよい。** Only select にすると、**新しくリポジトリを作るたびにトークンの設定を変えに行く**ことになり、そのたびに push が止まる。
+
+> 🚨 **そのかわり、Permissions は必要な1つだけにする。** `Contents: Read and write` だけ付けておけば、仮に漏れても**ファイルの読み書き**までで止まる。⛔ Administration（リポジトリの削除）や Secrets には触らせない。
+
+> 🚨 **無期限 × 全リポジトリなので、漏れたときの影響は大きい。** 漏らしたかもしれないと思ったら、すぐ **Settings → Developer settings → Fine-grained tokens** から **Delete** する。**消せばその瞬間に無効**になるので、気づいたら消すのが唯一で確実な対処。Token name を使う場所の名前にしておくと、どれを消せばよいかが分かる。
 
 🚨 **表示されたトークンは一度しか見られない。** その場でパスワードマネージャーに保存する。
 
 > 📝 **失くしても作り直せばよい。** 消して新しく発行するだけで、リポジトリには何も起きない。
-> 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は権限が粗く、リポジトリ単位の制限ができない。
+> 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は `repo` にチェックを入れた時点で、コードの読み書きだけでなく**リポジトリの削除・設定変更・Webhook まで全部できる**トークンになる。fine-grained なら `Contents` だけに絞れる。
 > 🚨 **トークンを `.env` やコードに書かない。** 一度 commit すると履歴に残り続ける。
+
+> 📝 **`No expiration` が選べないときは、一番長いものを選ぶ。** 会社や学校のアカウントだと、組織のポリシーで上限が決まっていることがある。
 
 push 時に聞かれたら、Username は GitHub のユーザー名、**Password の欄にトークンを貼る**。
 
