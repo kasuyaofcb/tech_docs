@@ -12,6 +12,7 @@
 | --- | --- | --- | --- |
 | 01 | **アプリリリース全体像** | **最初に読むやつ**。ローカル/Git/Supabase/Vercel/Azureがどう繋がるかの地図 | [01_app-release/app-release.md](01_app-release/app-release.md) |
 | 02 | Git | バージョン管理の全体像（作業ディレクトリ → ステージング → ローカル → リモート） | [02_git/git.md](02_git/git.md) |
+| 02' | Git 環境構築手順 | インストール→初期設定→最初のコミット（Part 1）／GitHubアカウント→認証→push（Part 2）。**Part 1 だけで完結する**ので、GitHubは後回しでよい | [02_git/setup.md](02_git/setup.md) |
 | 03 | Supabase | BaaSの全体像（Postgres中心にAuth / Storage / Realtime / Edge Functions / RLS） | [03_supabase/supabase.md](03_supabase/supabase.md) |
 | 04a | Vercel | フロントエンドCloudの全体像（Git連携デプロイ / Preview URL / Functions / 環境変数） | [04a_vercel/vercel.md](04a_vercel/vercel.md) |
 | 04b | Azure | 総合クラウドの全体像（テナント/サブスク階層 / Static Web Apps / CI-CDの安全弁 / 個人開発→本格運用） | [04b_azure/azure.md](04b_azure/azure.md) |
