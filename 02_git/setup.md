@@ -13,36 +13,38 @@
 
 ## 0. 全体マップ
 
+### 🟢 Part 1 — Git（30分）
+
 ```mermaid
-flowchart TB
-    P1["🟢 <b>Part 1</b><br/>Git<br/>(これだけで成立する)"]
+flowchart LR
+    S1["1.1<br/>入っているか<br/>確認"] ==> S2["1.2<br/>インストール<br/>「無い場合だけ」"]
+    S2 ==> S3["1.3<br/>初期設定<br/>名前・メール"]
+    S3 ==> S4["1.4<br/>最初の<br/>コミット"]
+    S4 ==> S5["1.5<br/>戻し方"]
+    S5 ==> G1["🎉<br/><b>壊しても<br/>戻せる</b>"]
 
-    P1 ==> S1["1.1<br/>入っているか確認"]
-    S1 ==> S2["1.2<br/>インストール<br/>(無い場合だけ)"]
-    S2 ==> S3["1.3<br/>初期設定<br/>(名前・メール)"]
-    S3 ==> S4["1.4<br/>最初のコミット"]
-    S4 ==> S5["1.5<br/>戻し方を覚える"]
-
-    S5 ==> GOAL1["🎉 履歴が残る状態"]
-
-    GOAL1 -.->|"人に見せたくなったら"| P2["🟡 <b>Part 2</b><br/>GitHub<br/>(後回しでよい)"]
-    P2 ==> T1["2.1<br/>アカウント"]
-    T1 ==> T2["2.2<br/>認証"]
-    T2 ==> T3["2.3<br/>リポジトリ作成<br/>+ push"]
-    T3 ==> GOAL2["🎉 公開・共有できる状態"]
-
-    style P1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style P2 fill:#F4C430,color:#000,stroke:#333,stroke-width:3px
     style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
     style S4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S5 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style G1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+> ⬇️ **ここで一度止まってよい。** 「人に見せたい / 別のPCから触りたい / PCが壊れても残したい」が出てきたら、下へ進む。
+
+### 🟡 Part 2 — GitHub（15分）
+
+```mermaid
+flowchart LR
+    T1["2.1<br/>アカウント"] ==> T2["2.2<br/>認証<br/>gh auth login"]
+    T2 ==> T3["2.3<br/>リポジトリ作成<br/>+ push"]
+    T3 ==> G2["🎉<br/><b>公開・共有<br/>できる</b>"]
+
     style T1 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style T2 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style T2 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
     style T3 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style GOAL1 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style GOAL2 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+    style G2 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
 | Part | 内容 | 所要時間 | いつやる |
@@ -58,9 +60,62 @@ flowchart TB
 
 ここだけで「壊しても戻せる」状態になる。
 
-## 1.1 すでに入っているか確認
+## 1.0 ターミナルを開く — コマンドはすべてここに打つ
 
-いちばん最初にこれを打つ。**入っていればインストールは丸ごと不要。**
+🚨 **この手順書に出てくるコマンドは、すべて Cursor のターミナルに打つ。** 別のアプリを開く必要はない。
+
+```mermaid
+flowchart LR
+    S1["①<br/>Cursor を開く"] ==> S2["②<br/>メニューの<br/>ターミナル →<br/>新しいターミナル"]
+    S2 ==> S3["③<br/>画面の下半分に<br/>パネルが開く"]
+    S3 ==> S4["④<br/>カーソルが<br/>点滅する位置に<br/>貼る"]
+
+    style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
+    style S3 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
+    style S4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
+```
+
+| | やること |
+| --- | --- |
+| 開き方 | Cursor 上部メニューの **ターミナル** → **新しいターミナル** |
+| ショートカット | `Ctrl` + `` ` ``（バッククォート） |
+| 開いた合図 | 画面の下半分に `TERMINAL` のパネルが出て、カーソルが点滅する |
+| 打つ場所 | その**カーソルの位置**。貼って `Enter` |
+
+![Cursor のターミナルを開いた状態](images/cursor-terminal.png)
+
+**この画面の見方:**
+
+| 場所 | 何が映っているか |
+| --- | --- |
+| 画面の下半分 | `TERMINAL` タブ。**ここが打つ場所** |
+| `MacBook-Pro-2:test ...$` の行 | プロンプト。`$` の右でカーソルが点滅している |
+| `$` の右の四角 | カーソル。**ここに貼って `Enter`** |
+
+> 📝 **行末の記号は環境で違う。** `$`（この画面）／`%`（zsh）／`>`（Windows の PowerShell）。**どれでもよい。カーソルが点滅していれば打てる状態。**
+
+> 📝 **上のほうに英語のメッセージが出ていても気にしない。** この画面の `The default interactive shell is now zsh.` のように、ターミナルは起動時にお知らせを出すことがある。エラーではない。
+
+> 📝 **バッククォートの場所**: 日本語キーボードは `Shift` + `@`。英語キーボードは `Esc` の下。
+> 📝 **Windows でも同じ。** Cursor のターミナルは PowerShell が開く。
+
+### コマンドの打ち方 — 4つのルール
+
+| ルール | なぜ |
+| --- | --- |
+| 🟢 **コードブロックの右上のコピーボタンで貼る** | 手で打つと必ずどこか間違える。GitHub 上ではブロックにマウスを乗せると右上にボタンが出る |
+| 🚨 **1行コピーしたら 1行 Enter。まとめて貼らない** | 途中で失敗したとき、どこまで進んだかが分かる |
+| 🚨 **`#` で始まる行は打たない** | 説明文。打っても何も起きないが、混乱する |
+| 🚨 **`<` `>` で囲まれた部分は自分の値に置き換える** | 例: `git restore <ファイル名>` → `git restore index.html` |
+
+> 🚨 **何も表示されなくても、たいてい成功している。** Git は成功したとき黙っているコマンドが多い。**エラーが出ていなければ次へ進む。**
+
+---
+
+## 1.1 Git がすでに入っているか確認
+
+1.0 で開いたターミナルに、これを貼って Enter。**入っていればインストールは丸ごと不要。**
 
 ```sh
 git --version
@@ -72,7 +127,7 @@ git --version
 | `command not found: git` | 1.2 でインストール |
 | 「コマンドライン・デベロッパ・ツール」のダイアログが出た（Mac） | 「インストール」を押す。終わったらもう一度 `git --version`。これで入れば 1.3 へ |
 
-> 📝 **Mac には最初から Git が入っていることが多い。** Xcode Command Line Tools に同梱されているため。バージョンが少し古いことはあるが、学習やふつうの개発には問題ない。
+> 📝 **Mac には最初から Git が入っていることが多い。** Xcode Command Line Tools に同梱されているため。バージョンが少し古いことはあるが、学習やふつうの開発には問題ない。
 
 ---
 
@@ -130,6 +185,8 @@ flowchart LR
 
 > 📝 **なぜ2種類の行があるのか**: `echo ... >> ~/.zprofile` は「**次にターミナルを開いたとき**のための設定ファイルへの追記」、`eval "$(...)"` は「**いま開いているターミナル**への即時反映」。役割が違うので両方必要。片方だけだと、閉じたら消える／今は使えない、のどちらかになる。
 
+> 🚨 **それでも `brew` が見つからないときは、ターミナルを開き直す。** Cursor のターミナルパネル右上の 🗑 でいまのターミナルを閉じ、`Ctrl` + `` ` `` でもう一度開く。`.zprofile` が読み直されて `brew` が使えるようになる。
+
 ### Windows — 公式インストーラー
 
 ```mermaid
@@ -154,6 +211,8 @@ flowchart LR
 | Choosing HTTPS transport backend | **Use the native Windows Secure Channel library** | Windows の証明書をそのまま使える |
 | Configuring the line ending conversions | **Checkout Windows-style, commit Unix-style**（既定） | 1.3 の `core.autocrlf` と同じ効果 |
 | それ以外 | すべて既定のまま Next | 変える理由がない |
+
+> 🚨 **インストールが終わったら Cursor を再起動する。** Windows は起動中のアプリに PATH の変更が届かないため、再起動しないと Cursor のターミナルで `git --version` が `command not found` のままになる。
 
 > 📝 Git for Windows には **Git Credential Manager** が同梱されている。Part 2 の認証が、初回 push のときにブラウザが開いて終わる。
 
