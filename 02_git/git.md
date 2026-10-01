@@ -358,7 +358,9 @@ flowchart TB
     style H fill:#7F8C8D,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
-main（master）に直接commitしない。必ずブランチ→PR→レビュー→mergeの流れ。
+**チーム開発では**、main（master）に直接commitしない。必ずブランチ→PR→レビュー→mergeの流れ。
+
+> 📝 **1人で練習しているうちは、main に直接 commit して push してよい。** [setup.md](setup.md) の手順もそうしている。PR は、他の人とコードを見せ合うようになってから使えば十分。
 
 ### PR まわりの用語
 
@@ -631,7 +633,7 @@ flowchart LR
 - 📦 `node_modules/` / `venv/` → 巨大で再生成可能
 - 🗂 `.DS_Store` / エディター設定 → OS/個人依存のゴミ
 
-> 📝 **`.env` と環境変数**: `.env` は「**環境変数**」（プログラムに外から渡す設定値）を書き込んでおくファイル。`API_KEY=abc123` のように「名前=値」のペアで書き、コードからは名前で呼び出す。**コード本体に秘密情報を書かないための仕組み**。本番ではVercelやSupabaseの管理画面側に同じ環境変数を登録する（[vercel.md](../04a_vercel/vercel.md) §7 / [supabase.md](../03_supabase/supabase.md) §12参照）。
+> 📝 **`.env` と環境変数**: `.env` は「**環境変数**」（プログラムに外から渡す設定値）を書き込んでおくファイル。`API_KEY=abc123` のように「名前=値」のペアで書き、コードからは名前で呼び出す。**コード本体に秘密情報を書かないための仕組み**。本番ではVercelやSupabaseの管理画面側に同じ環境変数を登録する（登録のしかたは [vercel.md](../04a_vercel/vercel.md) §7、Supabase のキーの種類は [supabase.md](../03_supabase/supabase.md) §12 を参照）。
 
 このリポジトリの[.gitignore](../.gitignore)が実例なので見てみよう。
 
@@ -790,7 +792,7 @@ flowchart TB
 
     B["🔄 既存の master リポジトリを main に変えたい"] ==> B1["<b>git branch -m master main</b><br/>ローカルのブランチ名変更"]
     B1 ==> B2["<b>git push -u origin main</b><br/>リモートに main を push"]
-    B2 ==> B3["GitHub画面で<br/>Default branch を main に変更<br/>(Settings → Branches)"]
+    B2 ==> B3["GitHub画面で<br/>Default branch を main に変更<br/>(Settings → General)"]
     B3 ==> B4["<b>git push origin --delete master</b><br/>リモートの master を削除"]
 
     style A fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
