@@ -19,7 +19,7 @@
 flowchart LR
     S1["1.1<br/>入っているか<br/>確認"] ==> S2["1.2<br/>インストール<br/>「無い場合だけ」"]
     S2 ==> S3["1.3<br/>初期設定<br/>名前・メール"]
-    S3 ==> S4["1.4<br/>最初の<br/>コミット"]
+    S3 ==> S4["1.4<br/>.gitignore<br/>+ 最初のコミット"]
     S4 ==> S5["1.5<br/>戻し方"]
     S5 ==> G1["🎉<br/><b>壊しても<br/>戻せる</b>"]
 
@@ -222,10 +222,17 @@ flowchart LR
 
 コミットに「誰がやったか」を刻むための設定。🚨 **これをしないとコミットできない。**
 
+**1行ずつ**貼って、`<>` の部分を自分の値に置き換えてから Enter。
+
 ```sh
-git config --global user.name "Taro Yamada"
-git config --global user.email "you@example.com"
+git config --global user.name "<あなたの名前>"
 ```
+
+```sh
+git config --global user.email "<あなたのメールアドレス>"
+```
+
+→ 例: `git config --global user.name "Taro Yamada"`
 
 確認:
 
@@ -240,7 +247,7 @@ git config --global --list
 
 > 🚨 **メールアドレスは公開される。** GitHub に上げると、コミット履歴から誰でも見える。隠したい場合は GitHub の `noreply` アドレス（`12345678+username@users.noreply.github.com`）を使う。GitHub の Settings → Emails → **Keep my email addresses private** で確認できる。
 
-> 🚨 **ここが違うと、自分のコミットとして数えられない。** GitHub 上で草（Contributions）が生えず、アイコンも出ない。あとから直すのは面倒なので、Part 2 をやる予定があるなら最初から揃えておく。
+> 🚨 **ここが違うと、自分のコミットとして数えられない。** GitHub の自分のページに出る活動記録（緑のマス目）が増えず、コミットの横に自分のアイコンも出ない。あとから直すのは面倒なので、Part 2 をやる予定があるなら最初から揃えておく。
 
 **改行コードの設定（Windows のみ）:**
 
@@ -256,10 +263,10 @@ git config --global core.autocrlf true
 
 ```mermaid
 flowchart LR
-    S1["①<br/>フォルダに移動<br/>cd"] ==> S2["②<br/>git init<br/>履歴を取る対象にする"]
-    S2 ==> S3["③<br/>git add .<br/>記録する候補に入れる"]
-    S3 ==> S4["④<br/>git commit<br/>セーブする"]
-    S4 ==> S5["⑤<br/>git log --oneline<br/>履歴を見る"]
+    S1["①<br/>Cursorで<br/>フォルダを開く"] ==> S2["②<br/>.gitignore<br/>を作る"]
+    S2 ==> S3["③<br/>git init<br/>履歴を取る対象にする"]
+    S3 ==> S4["④<br/>git add .<br/>記録する候補に入れる"]
+    S4 ==> S5["⑤<br/>git commit<br/>セーブする"]
 
     style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
     style S2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
@@ -268,17 +275,82 @@ flowchart LR
     style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
 ```
 
+### ① フォルダを開く — `cd` は打たない
+
+🚨 **Cursor で「作業したいフォルダ」を開いていれば、ターミナルは最初からそのフォルダにいる。** 移動のコマンドは要らない。
+
+| | やること |
+| --- | --- |
+| 開き方 | Cursor 上部メニューの **ファイル** → **フォルダを開く** → 自分のプロジェクトのフォルダを選ぶ |
+| 開いたあと | ターミナルを開き直す（`Ctrl` + `` ` ``） |
+
+いま自分がどこにいるかを確認する:
+
 ```sh
-cd ~/path/to/your-project
+pwd
+```
+
+→ **自分のプロジェクトのフォルダ名で終わっていればOK。**
+
+> 🚨 **ここが違うと、関係ないフォルダの履歴を取り始める。** `pwd` の結果が `/Users/あなたの名前` で終わっていたら、フォルダを開けていない。開き方からやり直す。
+
+### ② `.gitignore` を作る — `git add` より先に
+
+🚨 **これを先に作らないと、記録してはいけないファイルまで記録される。**
+
+Cursor の左のファイル一覧で右クリック → **新しいファイル** → `.gitignore` という名前で作り、中にこれを貼る。
+
+```text
+.env
+.env.local
+node_modules/
+.DS_Store
+```
+
+| 書いたもの | なぜ除外するか |
+| --- | --- |
+| `.env` / `.env.local` | 🔴 **APIキーやパスワードが入っている。** 一度記録すると履歴に残り続け、あとから消すのは非常に面倒 |
+| `node_modules/` | ライブラリの置き場。数万ファイルあり、記録する意味がない（`npm install` で作り直せる） |
+| `.DS_Store` | Mac が勝手に作る管理ファイル |
+
+> 🚨 **一度 `commit` したファイルは、あとから `.gitignore` に書いても記録され続ける。** だから `git add` より先に作る。
+
+### ③〜⑤ 履歴を取り始める
+
+**1行ずつ**貼って Enter。
+
+```sh
 git init
+```
+
+何が記録されようとしているか、先に見ておく:
+
+```sh
+git status
+```
+
+> 🚨 **ここに `.env` が出てきたら、② をやり直す。** `.gitignore` に書けていない。
+
+```sh
 git add .
+```
+
+```sh
 git commit -m "最初のコミット"
+```
+
+確認:
+
+```sh
 git log --oneline
 ```
+
+→ `a1b2c3d 最初のコミット` のように1行出れば成功。
 
 | コマンド | 意味 |
 | --- | --- |
 | `git init` | このフォルダを「履歴を取る対象」にする（隠しフォルダ `.git` ができる） |
+| `git status` | いまの状態を見る。**迷ったらこれ** |
 | `git add .` | 今の状態を「記録する候補」に入れる |
 | `git commit -m "..."` | セーブする |
 | `git log --oneline` | セーブ履歴を1行ずつ見る |
@@ -293,13 +365,27 @@ git log --oneline
 
 **コードを大きく書き換える前に `commit` しておけば、壊れても戻せる。** これが Part 1 をやる理由。
 
+**まず、何が変わったかを見る:**
+
 ```sh
-git diff                 # 最後のコミットから何が変わったか見る
-git restore <ファイル名>   # そのファイルだけ、最後のコミットの状態に戻す
-git restore .            # 編集を全部捨てて、最後のコミットの状態に戻す
+git diff
 ```
 
-> 🚨 **`git restore` は編集を消す。取り消せない。** 残したい変更があるなら、先に `git commit` する。迷ったら `git diff` で中身を見てから。
+**1ファイルだけ戻す:**
+
+```sh
+git restore <ファイル名>
+```
+
+→ `<ファイル名>` は自分の値に置き換える。例: `git restore index.html`
+
+**編集を全部捨てて戻す:**
+
+```sh
+git restore .
+```
+
+> 🚨 **`git restore` は編集を消す。取り消せない。** 残したい変更があるなら、先に `git commit` する。**迷ったら必ず `git diff` で中身を見てから。**
 
 > 📝 **AI にコードを書き換えてもらうなら、指示を出す前に1回 `commit` しておくのがいちばん安い保険。** 気に入らなければ `git restore .` で指示前に戻る。
 
@@ -311,9 +397,17 @@ git restore .            # 編集を全部捨てて、最後のコミットの�
 
 - [ ] `git --version` でバージョンが出る
 - [ ] `git config --global --list` に `user.name` と `user.email` がある
-- [ ] 自分のフォルダで `git log --oneline` にコミットが1つ以上出る
-- [ ] ファイルを適当に書き換えて `git diff` で差分が見える
-- [ ] `git restore .` で元に戻る
+- [ ] `pwd` が自分のプロジェクトのフォルダを指している
+- [ ] `git status` に `.env` が出てこない
+- [ ] `git log --oneline` にコミットが1つ以上出る
+
+**最後に、戻せることを1回だけ試す:**
+
+1. 適当なファイルを開いて、**消えても困らない1行**（コメントなど）を足して保存する
+2. `git diff` → その1行が出る
+3. `git restore .` → 足した1行が消えて、元に戻る
+
+> 🚨 **この練習は、保存していない大事な編集が無い状態でやる。** `git restore .` は、まだ `commit` していない編集を**すべて**消す。
 
 **ここまでできたら、GitHub は後回しでよい。**
 
@@ -327,11 +421,25 @@ git restore .            # 編集を全部捨てて、最後のコミットの�
 
 | ステップ | やること | 注意 |
 | --- | --- | --- |
-| ① | [github.com](https://github.com) で Sign up | |
+| ① | [github.com](https://github.com) で Sign up | 画面の案内どおりで迷わない |
 | ② | メールアドレスを認証 | 🚨 **1.3 の `user.email` と同じメールにする**（違う場合は Settings → Emails で追加登録する） |
-| ③ | 2要素認証（2FA）を設定 | 必須。アプリ（Authenticator 等）かSMS |
+| ③ | 2要素認証（2FA）を設定 | 必須。下を読む |
 
-> 🚨 **2FA は必須化されている。** 後回しにすると、ある日ログインできなくなる。リカバリーコードは必ず保存する。
+### ③ 2要素認証（2FA）— ここだけ丁寧に
+
+🚨 **GitHub は 2FA が必須。** 設定しないまま使い続けると、アカウントが制限される。
+
+| ステップ | やること |
+| --- | --- |
+| 1 | スマホに認証アプリを入れる（**Google Authenticator** / **Microsoft Authenticator** / 1Password など） |
+| 2 | GitHub の **Settings** → **Password and authentication** → **Enable two-factor authentication** |
+| 3 | 画面に出た QRコードを、認証アプリで読み取る |
+| 4 | アプリに出た6桁の数字を GitHub に入力 |
+| 5 | 🔴 **リカバリーコード（16個の文字列）が表示される。必ずダウンロードして保存する** |
+
+> 🚨 **5を飛ばさない。** スマホを機種変更したり失くしたりすると、**リカバリーコードが無い限りアカウントに二度と入れなくなる。** パスワードマネージャーに入れるか、印刷して手元に置く。
+
+> 📝 SMS でも設定できるが、認証アプリのほうが安全で、電波が無くても使える。
 
 ---
 
@@ -347,9 +455,19 @@ git restore .            # 編集を全部捨てて、最後のコミットの�
 
 ### 🅰️ GitHub CLI（推奨）
 
+**Mac — `gh` を入れる:**
+
 ```sh
-brew install gh      # Mac
-# Windows は Git for Windows 同梱の Credential Manager でもよい（初回 push でブラウザが開く）
+brew install gh
+```
+
+> 🚨 **`brew: command not found` と出たら、Homebrew が入っていない。** 1.1 で Git がすでに入っていた人は、1.2 を飛ばしているのでこの状態になる。**1.2 の「Mac — Homebrew 経由」の ①〜④ だけ**をやってから戻ってくる（`brew install git` は不要）。
+
+**Windows:** Git for Windows 同梱の Credential Manager でもよい（初回 push でブラウザが開いて終わる）。`gh` を使うなら `winget install GitHub.cli`。
+
+**ログインする:**
+
+```sh
 gh auth login
 ```
 
@@ -418,10 +536,19 @@ gh repo create my-app --private --source=. --remote=origin --push
 
 **手でやる場合:**
 
+まず GitHub 上で**空の**リポジトリを作る（**README にチェックを入れない**）。そのあと、**1行ずつ**貼る。
+
 ```sh
-# GitHubで「空の」リポジトリを作ってから（README を追加しない）
-git remote add origin https://github.com/あなたのユーザー名/リポジトリ名.git
+git remote add origin https://github.com/<ユーザー名>/<リポジトリ名>.git
+```
+
+→ `<>` の部分は自分の値に置き換える。GitHub のリポジトリ画面に出ている URL をそのままコピーするのが確実。
+
+```sh
 git branch -M main
+```
+
+```sh
 git push -u origin main
 ```
 
