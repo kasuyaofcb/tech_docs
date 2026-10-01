@@ -1,7 +1,5 @@
 # Git 全体像
 
-> 📝 本資料の`main`ブランチは、古い呼称では`master`と同じものです。以降`main（master）`と表記します。
-
 > 📝 **これは「読む」資料。** コマンドを暗記する必要はない。**どの言葉が何を指しているか**が分かれば十分。実際に手を動かす順番は [setup.md](setup.md) にある。
 
 > 📝 **知らない言葉が出てきたら** → 巻末の **§11 用語集** に、読み方とひとこと説明をまとめてある。
@@ -196,8 +194,8 @@ git commit -m "ログイン画面を追加"
 | オプション | 元の単語 | 意味 |
 | --- | --- | --- |
 | `-m` | message | メッセージを付ける |
-| `-b` | branch | ブランチを作る（`git checkout -b`） |
-| `-c` | create | 作る（`git switch -c`） |
+| `-c` | create | ブランチを作る（`git switch -c`） |
+| `-b` | branch | ブランチを作る（昔の書き方 `git checkout -b`。→ §3） |
 | `-d` | delete | 削除する（`git branch -d`） |
 | `--oneline` | — | 1行ずつ簡潔に表示（`git log --oneline`） |
 
@@ -209,7 +207,7 @@ git commit -m "ログイン画面を追加"
 | --- | --- | --- |
 | `feature/login` | **自分で決める** | ブランチ名。`/` で分類するのは**慣習だけ**で、Gitのルールではない |
 | `"ログイン画面を追加"` | **自分で決める** | コミットメッセージ |
-| `origin` | 決まっている（慣習） | `clone` してきたリモートに**自動で付く名前**。実質「GitHub上の自分のリポジトリ」 |
+| `origin` | 決まっている（慣習） | リモートに付ける**呼び名**。`clone` すると自動で付き、自分で登録するときも慣習でこの名前にする。実質「GitHub上の自分のリポジトリ」 |
 | `main` | ほぼ決まっている | 既定のブランチ名（→ §10） |
 | `HEAD` | **決まっている** | 「いま自分がいるコミット」を指すGitの予約語（→ §7） |
 
@@ -270,6 +268,8 @@ flowchart TB
 > 📝 **ブランチ**（branch＝木の枝）とは: 履歴を枝分かれさせて、**`main` を触らずに作業する**ための仕組み。
 > 文書作業でいえば「`企画書.docx` を `企画書_コピー.docx` にして、そっちを書き換える」に近い。違うのは、**書き終わったあとに元のファイルへきれいに取り込める**こと。その取り込みが **merge（マージ＝合流）**。
 
+> 📝 **`main` は、本体にあたるブランチの名前。** 古い資料では `master` と書かれているが、同じもの（→ §10）。この資料では以降 `main（master）` と表記することがある。
+
 ```mermaid
 %%{init: { 'theme': 'base', 'themeVariables': {
   'git0': '#3498DB', 'git1': '#E67E22',
@@ -303,8 +303,8 @@ main（master）に影響を与えずに作業するため、機能ごとに枝�
 
 ```mermaid
 flowchart LR
-    C1["<b>git checkout -b feature/login</b><br/>①ブランチ作成+移動"] ==> C2["編集 → add → commit<br/>②feature/loginで作業"]
-    C2 ==> C3["<b>git checkout main</b><br/>③mainに戻る"]
+    C1["<b>git switch -c feature/login</b><br/>①ブランチ作成+移動"] ==> C2["編集 → add → commit<br/>②feature/loginで作業"]
+    C2 ==> C3["<b>git switch main</b><br/>③mainに戻る"]
     C3 ==> C4["<b>git merge feature/login</b><br/>④mainに合流"]
     C4 ==> C5["<b>git branch -d feature/login</b><br/>⑤用済みを削除"]
 
@@ -327,7 +327,7 @@ flowchart LR
 | ブランチを移動 | `git switch main` | `git checkout main` |
 | ファイルの変更を破棄 | `git restore ファイル名` | `git checkout -- ファイル名` |
 
-**どちらでも動く。** ネット上の資料は `checkout` が圧倒的に多いので、**読めるようにしておいて、書くときは `switch` / `restore`** が今のおすすめ。
+**どちらでも動く。** ネット上の資料は `checkout` が圧倒的に多いので、**読めるようにしておいて、書くときは `switch` / `restore`** が今のおすすめ。この資料の図も `switch` で書いている。
 
 ---
 
@@ -339,7 +339,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    A["① ブランチ作成<br/>git checkout -b"] ==> B["② 編集 → add → commit"]
+    A["① ブランチ作成<br/>git switch -c"] ==> B["② 編集 → add → commit"]
     B ==> C["③ git push"]
     C ==> D["④ GitHub で<br/>PR を作成"]
     D ==> E{"⑤ レビュー"}
@@ -368,7 +368,7 @@ main（master）に直接commitしない。必ずブランチ→PR→レビュ�
 | **Approve** | アプルーブ | 「入れてOK」の承認。これが揃わないとMergeできない設定が一般的 |
 | **Request changes** | — | 「直してから出し直して」の差し戻し |
 | **Merge** | マージ | `main` に実際に取り込む操作。GitHubの緑のボタン |
-| **origin** | オリジン | `clone` 元のリモートに付く既定の名前。実質「GitHub上のこのリポジトリ」 |
+| **origin** | オリジン | リモートに付ける慣習の呼び名（`clone` すると自動で付く）。実質「GitHub上のこのリポジトリ」 |
 | **fork** | フォーク | 他人のリポジトリを**自分のアカウントに丸ごとコピー**するGitHubの機能。書き込み権限がない相手にPRを送るときに使う |
 | **Branch protection** | — | 「`main` への直接pushを禁止」などをGitHub側で強制する設定 |
 
@@ -412,7 +412,7 @@ Changes not staged for commit:
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
-        .env
+        memo.txt
 ```
 
 英語で怖く見えるが、**言っているのは3つだけ**。しかも §1 の4つの場所と対応している。
@@ -433,7 +433,7 @@ Untracked files:
 $ git status -s
 M  README.md
  M main.py
-?? .env
+?? memo.txt
 ```
 
 記号は**2文字**で、**1文字目がステージング、2文字目が作業ディレクトリ**の状態を表す。
@@ -588,6 +588,8 @@ flowchart TB
 
 > 🚨 **`git reset --hard` は打つ前に一度止まる。** 上の図で使っている `--soft` は「コミットだけ取り消して変更内容は残す」。一方 `--hard` は**作業中の変更ごと消える**。消えたものは基本的に戻らない。
 
+> 📝 **直前のコミットのメッセージだけ直したいとき（未push）**: `git commit --amend -m "正しいメッセージ"`。直前のコミットが**新しいメッセージで上書き**される。add し忘れたファイルがあれば、先に `git add` してから同じコマンドを打つと一緒に入る。**`-m` を付け忘れるとエディタが開く**ので、そのときは `Esc` → `:q!` → `Enter` で抜ける。push 済みのコミットには使わない（`reset` と同じく履歴の書き換えになる）。
+
 > 📝 **`revert` は「打ち消しのコミットを新しく積む」。** 履歴を書き換えないので、push済みでも安全に使える。「消す」のではなく「取り消した事実を残す」のが revert。
 
 ---
@@ -631,7 +633,7 @@ flowchart LR
 
 > 📝 **`.env` と環境変数**: `.env` は「**環境変数**」（プログラムに外から渡す設定値）を書き込んでおくファイル。`API_KEY=abc123` のように「名前=値」のペアで書き、コードからは名前で呼び出す。**コード本体に秘密情報を書かないための仕組み**。本番ではVercelやSupabaseの管理画面側に同じ環境変数を登録する（[vercel.md](../04a_vercel/vercel.md) §7 / [supabase.md](../03_supabase/supabase.md) §12参照）。
 
-このリポジトリの[.gitignore](../../.gitignore)が実例なので見てみよう。
+このリポジトリの[.gitignore](../.gitignore)が実例なので見てみよう。
 
 ### ⚠️ よくある罠: 「すでに追跡中のファイルは無視できない」
 
@@ -655,7 +657,7 @@ flowchart LR
 
 ## 9. git stash（作業中の変更を一時退避）
 
-**stash**は、作業ディレクトリにある**まだコミットしていない変更**を、いったん**別の場所に退避**する仕組みです。別ブランチに切り替えたいが変更を捨てたくない、急ぎの修正に移りたい、などのときに使います（コミットではないので、履歴には残りません）。
+**stash**は、作業ディレクトリにある**まだコミットしていない変更**を、いったん**別の場所に退避**する仕組み。別ブランチに切り替えたいが変更を捨てたくない、急ぎの修正に移りたい、などのときに使う（コミットではないので、履歴には残らない）。
 
 > 📝 **読みは「スタッシュ」。** stash は英語で「こっそりしまっておく」。`git stash` と打つだけで使えて、**コミットではない**ので履歴が汚れない。
 
@@ -685,9 +687,9 @@ sequenceDiagram
     U->>F: 編集中...（未コミット）
     Note over U,F: 🚨 緊急バグ報告！
     U->>F: git stash push -m "ログイン画面 途中"
-    U->>M: git checkout main
+    U->>M: git switch main
     U->>M: バグ修正 → add → commit → push
-    U->>F: git checkout feature/login
+    U->>F: git switch feature/login
     U->>F: git stash pop（作業再開）
 ```
 
@@ -700,7 +702,7 @@ sequenceDiagram
 ```mermaid
 flowchart LR
     S1["😱 main で<br/>編集してた"] ==> S2["<b>git stash</b><br/>変更を退避"]
-    S2 ==> S3["<b>git checkout -b feature/xxx</b><br/>正しいブランチを切る"]
+    S2 ==> S3["<b>git switch -c feature/xxx</b><br/>正しいブランチを切る"]
     S3 ==> S4["<b>git stash pop</b><br/>変更を呼び戻す"]
     S4 ==> S5["✅ feature/xxx で<br/>add → commit"]
 
@@ -819,7 +821,7 @@ flowchart TB
 | **ステージング（index）** | Staging Area | 次のコミットに入れると決めた変更の置き場 | §1 |
 | **ローカルリポジトリ** | Local Repository | 自分のPC内の、確定した履歴 | §1 |
 | **リモート（リポジトリ）** | Remote Repository | GitHub上の、共有された履歴 | §1 |
-| **origin** | オリジン | cloneしてきたリモートに自動で付く名前 | §1 §4 |
+| **origin** | オリジン | リモートに付ける慣習の呼び名（cloneすると自動で付く） | §1 §4 |
 | **コミット** | commit | セーブポイント1個。またはその記録 | §0 §1 |
 | **コミットID（ハッシュ）** | — | コミット1個に付く固有の文字列。先頭7文字くらいで指定できる | §5 |
 | **ブランチ** | branch | 本体を触らずに作業するための枝分かれ | §3 |
@@ -853,6 +855,7 @@ flowchart TB
 | `git restore <ファイル>` | 編集を破棄して元に戻す | §7 |
 | `git restore --staged <ファイル>` | ステージングから下ろす | §7 |
 | `git reset --soft HEAD^` | 直前のコミットだけ取り消す（変更は残る） | §7 |
+| `git commit --amend -m "メモ"` | 直前のコミットのメッセージを直す（未push限定） | §7 |
 | `git revert <コミットID>` | 打ち消しコミットを積む（push後の正解） | §7 |
 | `git rm --cached <ファイル>` | 追跡から外す（ファイル自体は残る） | §8 |
 | `git stash` / `git stash pop` | 未コミットの変更を退避 / 戻す | §9 |

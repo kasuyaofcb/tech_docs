@@ -17,7 +17,7 @@
 ```mermaid
 flowchart LR
     S1["1.1<br/>入っているか<br/>確認"] ==> S2["1.2<br/>インストール<br/>「無い場合だけ」"]
-    S2 ==> S3["1.3<br/>初期設定<br/>名前・メール"]
+    S2 ==> S3["1.3<br/>初期設定<br/>名前・メール・main"]
     S3 ==> S4["1.4<br/>.gitignore<br/>+ 最初のコミット"]
     S4 ==> S5["1.5<br/>戻し方"]
     S5 ==> G1["🎉<br/><b>壊しても<br/>戻せる</b>"]
@@ -72,7 +72,7 @@ flowchart LR
 
 > 📝 **起動時に英語のメッセージが出ても気にしない。** 上の画面の `The default interactive shell is now zsh.` のような案内が出ることがある。エラーではない。
 
-### コマンドの打ち方 — 6つのルール
+### コマンドの打ち方 — 5つのルール
 
 | ルール | なぜ |
 | --- | --- |
@@ -172,14 +172,31 @@ git --version
 **⑤ 最大の詰まりどころ。** インストールが終わると、画面の最後にこう出る。
 
 ```text
+==> Installation successful!
+
+==> Homebrew has enabled anonymous aggregate formulae and cask analytics.
+（英語の説明が数行続く）
+
 ==> Next steps:
 - Run these commands in your terminal to add Homebrew to your PATH:
-    echo >> /Users/あなたの名前/.zprofile
+    echo >> /Users/あなたの名前/.zprofile                                                      ← ここから
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/あなたの名前/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    eval "$(/opt/homebrew/bin/brew shellenv)"                                                 ← ここまで
+- Run brew help to get started
+- Further documentation:
+    https://docs.brew.sh
 ```
 
-この**インデントされた行**をコピーして、ターミナルに貼って Enter。
+**`==> Next steps:` の下の、字下げされた3行**だけを使う（`←` の印はこの手順書で付けたもので、実際の画面には出ない）。
+
+| 行 | 使う？ |
+| --- | --- |
+| `Installation successful!` | 見るだけ。**ここまで来れば成功** |
+| `analytics` の説明 | 読まなくてよい |
+| `Next steps:` の下の**字下げされた3行** | 🟢 **1行ずつコピーして、ターミナルに貼って Enter** |
+| `Run brew help` / `docs.brew.sh` | 実行しなくてよい |
+
+> 📝 **上にスクロールしないと見えないときは、ターミナルのパネルをマウスでスクロールして `Next steps:` を探す。** 文字が流れて見失っても、インストールは成功している。
 
 🚨 **この手順書の行ではなく、自分の画面に出た行を使う。** Apple シリコンは `/opt/homebrew`、Intel Mac は `/usr/local` と、パスが変わる。
 
@@ -202,7 +219,7 @@ git --version
 
 ---
 
-## 1.3 初期設定（2つだけ）
+## 1.3 初期設定（3つだけ）
 
 コミットに「誰がやったか」を刻むための設定。🚨 **これをしないとコミットできない。**
 
@@ -218,6 +235,14 @@ git config --global user.email "<あなたのメールアドレス>"
 
 → 例: `git config --global user.name "Taro Yamada"`
 
+3つ目は**そのまま貼って** Enter（書き換える部分はない）。
+
+```sh
+git config --global init.defaultBranch main
+```
+
+> 📝 **これは「最初のブランチ名を `main` にする」設定。** Mac に最初から入っている Git は、何もしないと昔の名前の `master` で始まり、`git init` のたびに黄色い `hint:` が何行も出る。GitHub は `main` が標準なので、ここで揃えておく（詳しくは [git.md](git.md) の §10）。
+
 確認:
 
 ```sh
@@ -228,6 +253,7 @@ git config --global --list
 | --- | --- | --- |
 | `user.name` | コミット履歴に出る名前 | 本名でもハンドルネームでもよい |
 | `user.email` | コミット履歴に出るメール | 🚨 Part 2 で GitHub を使うなら、**GitHub に登録したメールと同じにする** |
+| `init.defaultbranch` | `git init` したときの最初のブランチ名 | `main` になっていればよい（一覧では小文字で表示される） |
 
 > 🚨 **メールアドレスは公開される。** GitHub に上げると、コミット履歴から誰でも見える。隠したい場合は GitHub の `noreply` アドレス（`12345678+username@users.noreply.github.com`）を使う。Settings → Emails → **Keep my email addresses private** で確認できる。
 
@@ -286,9 +312,23 @@ node_modules/
 | `node_modules/` | ライブラリの置き場。数万ファイルあり、記録する意味がない（`npm install` で作り直せる） |
 | `.DS_Store` | Mac が勝手に作る管理ファイル |
 
+🚨 **貼ったら `Cmd` + `S`（Windows は `Ctrl` + `S`）で保存する。** タブのファイル名の横に `●` が出ている間は、まだ保存されていない。
+
 > 🚨 **一度 `commit` したファイルは、あとから `.gitignore` に書いても記録され続ける。** だから `git add` より先に作る。
 
-### ③ 履歴を取り始める
+### ③ 練習用のファイルを1つ作る
+
+新しく作ったフォルダだと、中身は `.gitignore` だけ。これでは 1.5 で「戻す」練習ができないので、**ふつうのファイルを1つ作っておく。**
+
+② と同じやり方で `memo.txt` を作り、中に1行書いて**保存**する。
+
+```text
+はじめてのGit
+```
+
+> 📝 **もとからファイルが入っているフォルダなら、③ は飛ばしてよい。** 1.5 の練習は、そのファイルで代わりにできる。
+
+### ④ 履歴を取り始める
 
 **1行ずつ**貼って Enter。
 
@@ -362,21 +402,21 @@ git restore .
 
 > 📝 **AI にコードを書き換えてもらうなら、指示を出す前に1回 `commit` しておくのがいちばん安い保険。** 気に入らなければ `git restore .` で指示前に戻る。
 
-> 📝 もっと踏み込んだ戻し方（コミット済みを取り消す / 直前のコミットを直す）は [git.md](git.md) の「やらかした時の戻し方」にある。
+> 📝 もっと踏み込んだ戻し方（コミット済みを取り消す / 直前のコミットのメッセージを直す）は [git.md](git.md) の「やらかした時の戻し方」にある。
 
 ---
 
 ### ✅ Part 1 のチェック
 
 - [ ] `git --version` でバージョンが出る
-- [ ] `git config --global --list` に `user.name` と `user.email` がある
+- [ ] `git config --global --list` に `user.name` と `user.email` と `init.defaultbranch=main` がある
 - [ ] `pwd` が自分のプロジェクトのフォルダを指している
 - [ ] `git status` に `.env` が出てこない
 - [ ] `git log --oneline` にコミットが1つ以上出る
 
 **最後に、戻せることを1回だけ試す:**
 
-1. 適当なファイルを開いて、**消えても困らない1行**（コメントなど）を足して保存する
+1. 1.4 の ③ で作った `memo.txt` を開いて、**消えても困らない1行**を足して保存する
 2. `git diff` → その1行が出る
 3. `git restore .` → 足した1行が消えて、元に戻る
 
@@ -421,8 +461,7 @@ git restore .
 | 方法 | 手間 | 向き |
 | --- | --- | --- |
 | 🅰️ **GitHub CLI**（`gh auth login`） | **2分** | 🟢 まずこれ。自分でトークンを保管しなくてよい |
-| 🅱️ Cursor / VSCode のサインイン | 3分 | エディタの中で完結させたい |
-| 🅲 パーソナルアクセストークン（PAT） | 10分 | CLI が入れられない環境 / CI |
+| 🅱️ パーソナルアクセストークン（PAT） | 10分 | CLI が入れられない環境 / CI |
 
 ### 🅰️ GitHub CLI（推奨）
 
@@ -431,6 +470,7 @@ brew install gh
 ```
 
 > 🚨 **`brew: command not found` と出たら、Homebrew が入っていない。** 1.1 で Git がすでに入っていた人はこの状態になる。**1.2 の「Mac — Homebrew 経由」の ①〜⑥ だけ**をやってから戻る（`brew install git` は不要）。
+
 > 📝 **Windows** は Git Credential Manager でもよい（初回 push でブラウザが開いて終わる）。`gh` を使うなら `winget install GitHub.cli`。
 
 ```sh
@@ -449,9 +489,10 @@ gh auth login
 → 8桁のコードが表示される。Enter でブラウザが開くので、そのコードを貼って承認。確認は `gh auth status`。
 
 > 📝 **順番はバージョンで少し変わる。** 聞かれた内容で判断する。
+
 > 🚨 `Authenticate Git with your GitHub credentials?` を **Yes** にしないと、`gh` のログインは通るのに `git push` だけ失敗する。
 
-### 🅲 PAT（CLI が使えないとき）
+### 🅱️ PAT（CLI が使えないとき）
 
 GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token
 
@@ -480,7 +521,9 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 🚨 **表示されたトークンは一度しか見られない。** その場でパスワードマネージャーに保存する。push 時に聞かれたら、Username は GitHub のユーザー名、**Password の欄にトークンを貼る**。
 
 > 🚨 **漏らしたかもしれないと思ったら、すぐ Delete する。** Fine-grained tokens の画面から消せば、**その瞬間に無効**になる。期限を待つ必要はない。
+
 > 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は `repo` にチェックを入れた時点で、コードの読み書きだけでなく**リポジトリの削除・設定変更・Webhook まで全部できる**トークンになる。
+
 > 🚨 **トークンを `.env` やコードに書かない。** 一度 commit すると履歴に残り続ける。
 
 ---
@@ -550,7 +593,7 @@ git push -u origin main
 | 出たメッセージ | 原因 | 対処 |
 | --- | --- | --- |
 | `Support for password authentication was removed` | パスワードを入れている | 2.2 の認証をやる |
-| `fatal: Authentication failed for 'https://github.com/...'` | 🔴 **トークンの期限切れ**、または値が違う | 2.2 🅲 で作り直す（2分）。**履歴は無事なので慌てない** |
+| `fatal: Authentication failed for 'https://github.com/...'` | 🔴 **トークンの期限切れ**、または値が違う | 2.2 🅱️ で作り直す（2分）。**履歴は無事なので慌てない** |
 | `remote origin already exists` | すでに origin が登録されている | `git remote set-url origin <新しいURL>` |
 | `src refspec main does not match any` | コミットが1つもない | 1.4 の `git commit` を先にやる |
 | `failed to push some refs` / `fetch first` | GitHub 側に自分が持っていないコミットがある | `git pull --rebase origin main` → もう一度 push |
