@@ -4,9 +4,8 @@
 
 🧠 想定する到達点:
 
-- `git --version` でバージョンが表示される
-- 自分のフォルダで `git init` → `git commit` ができる
-- 間違えたとき `git restore` で直前の状態に戻せる
+- 自分のフォルダで `git commit` ができ、履歴が残る
+- 間違えたとき、直前の状態に戻せる
 - （Part 2）GitHub にリポジトリを作って `git push` できる
 
 ---
@@ -47,75 +46,65 @@ flowchart LR
     style G2 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
 ```
 
-| Part | 内容 | 所要時間 | いつやる |
-| --- | --- | --- | --- |
-| 1 | Git のインストール + 初期設定 + 最初のコミット | 30分 | **最初に** |
-| 2 | GitHub アカウント + 認証 + 初めての push | 15分 | 人に見せたくなったとき |
-
 > 📝 **Part 1 と Part 2 は切り離してよい。** Part 1 だけでバージョン管理は成立する（自分のPCの中に履歴が残る）。GitHub は「人に見せる / 別のPCから触る / PCが壊れても残す」ための箱で、**無くても作業は進む**。
+
+> 🔧 **うまくいかないときは、巻末の[困ったとき](#困ったとき)を見る。** エラーメッセージから引けるようにしてある。
 
 ---
 
 # Part 1: Git
 
-ここだけで「壊しても戻せる」状態になる。
+## 1.0 はじめに — 進め方の約束
 
-## 1.0 ターミナルを開く — コマンドはすべてここに打つ
+### ターミナルを開く
 
-🚨 **この手順書に出てくるコマンドは、すべて Cursor のターミナルに打つ。** 別のアプリを開く必要はない。
-
-```mermaid
-flowchart LR
-    S1["①<br/>Cursor を開く"] ==> S2["②<br/>メニューの<br/>ターミナル →<br/>新しいターミナル"]
-    S2 ==> S3["③<br/>画面の下半分に<br/>パネルが開く"]
-    S3 ==> S4["④<br/>カーソルが<br/>点滅する位置に<br/>貼る"]
-
-    style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style S3 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S4 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:3px
-```
+🚨 **この手順書のコマンドは、すべて Cursor のターミナルに打つ。** 別のアプリを開く必要はない。
 
 | | やること |
 | --- | --- |
 | 開き方 | Cursor 上部メニューの **ターミナル** → **新しいターミナル** |
-| ショートカット | `Ctrl` + `` ` ``（バッククォート） |
-| 開いた合図 | 画面の下半分に `TERMINAL` のパネルが出て、カーソルが点滅する |
-| 打つ場所 | その**カーソルの位置**。貼って `Enter` |
+| ショートカット | `Ctrl` + `` ` ``（バッククォート。日本語キーボードは `Shift` + `@`） |
+| 打つ場所 | 下半分に出たパネルの、**カーソルが点滅している位置**。貼って `Enter` |
 
 ![Cursor のターミナルを開いた状態](images/cursor-terminal.png)
 
-**この画面の見方:**
+行末の記号は環境で違う（`$` / `%` / Windows は `>`）。**どれでもよい。カーソルが点滅していれば打てる状態。**
 
-| 場所 | 何が映っているか |
-| --- | --- |
-| 画面の下半分 | `TERMINAL` タブ。**ここが打つ場所** |
-| `MacBook-Pro-2:test ...$` の行 | プロンプト。`$` の右でカーソルが点滅している |
-| `$` の右の四角 | カーソル。**ここに貼って `Enter`** |
+> 📝 **起動時に英語のメッセージが出ても気にしない。** 上の画面の `The default interactive shell is now zsh.` のような案内が出ることがある。エラーではない。
 
-> 📝 **行末の記号は環境で違う。** `$`（この画面）／`%`（zsh）／`>`（Windows の PowerShell）。**どれでもよい。カーソルが点滅していれば打てる状態。**
-
-> 📝 **上のほうに英語のメッセージが出ていても気にしない。** この画面の `The default interactive shell is now zsh.` のように、ターミナルは起動時にお知らせを出すことがある。エラーではない。
-
-> 📝 **バッククォートの場所**: 日本語キーボードは `Shift` + `@`。英語キーボードは `Esc` の下。
-> 📝 **Windows でも同じ。** Cursor のターミナルは PowerShell が開く。
-
-### コマンドの打ち方 — 4つのルール
+### コマンドの打ち方 — 5つのルール
 
 | ルール | なぜ |
 | --- | --- |
-| 🟢 **コードブロックの右上のコピーボタンで貼る** | 手で打つと必ずどこか間違える。GitHub 上ではブロックにマウスを乗せると右上にボタンが出る |
+| 🟢 **コードブロックの右上のコピーボタンで貼る** | 手で打つと必ずどこか間違える |
 | 🚨 **1行コピーしたら 1行 Enter。まとめて貼らない** | 途中で失敗したとき、どこまで進んだかが分かる |
 | 🚨 **`#` で始まる行は打たない** | 説明文。打っても何も起きないが、混乱する |
 | 🚨 **`<` `>` で囲まれた部分は自分の値に置き換える** | 例: `git restore <ファイル名>` → `git restore index.html` |
+| 🚨 **画面が文字で埋まって止まったら `q` を押す** | 出力が長いと自動でページャが開く。**壊れていない。`q` で抜ける** |
 
 > 🚨 **何も表示されなくても、たいてい成功している。** Git は成功したとき黙っているコマンドが多い。**エラーが出ていなければ次へ進む。**
+
+### 詰まったら、AI に聞く
+
+⭐ **この手順書どおりに進まないことは必ず起きる。** 画面の表示が違う、知らないエラーが出る、など。そのときは **Cursor のチャット**（`Cmd` + `L`）に聞くのがいちばん早い。Claude Code を入れていればそれでもよい。
+
+**聞き方は1つだけ覚える — エラーをそのまま貼る。**
+
+| ⛔ 伝わらない | 🟢 解決する |
+| --- | --- |
+| 「git が動きません」 | **ターミナルに出た文字を全部そのままコピーして貼る** ＋「何をしようとして、何をしたか」を1行 |
+
+> 📝 **要約しないのがコツ。** 自分で「たぶんこういうエラー」とまとめると、肝心の情報が落ちる。**原文のまま貼るのがいちばん速い。**
+
+> 🚨 **AI の答えをそのまま実行しない3つ。** 返ってきたコマンドに `rm` / `--force`・`-f` / `reset --hard` が入っていたら、実行する前に「**これは何をするコマンドですか。元に戻せますか**」ともう一度聞く。AI は「直す」ために、**作業を消すコマンドを提案することがある。**
+
+> 🚨 **トークンやパスワードは貼らない。** エラーに混ざっていたら、その部分を `****` に置き換えてから貼る。
 
 ---
 
 ## 1.1 Git がすでに入っているか確認
 
-1.0 で開いたターミナルに、これを貼って Enter。**入っていればインストールは丸ごと不要。**
+ターミナルにこれを貼って Enter。**入っていればインストールは丸ごと不要。**
 
 ```sh
 git --version
@@ -125,9 +114,9 @@ git --version
 | --- | --- |
 | `git version 2.39.3` のようにバージョンが出た | **1.3 へ飛ぶ。インストールは不要** |
 | `command not found: git` | 1.2 でインストール |
-| 「コマンドライン・デベロッパ・ツール」のダイアログが出た（Mac） | 「インストール」を押す。終わったらもう一度 `git --version`。これで入れば 1.3 へ |
+| 「コマンドライン・デベロッパ・ツール」のダイアログが出た（Mac） | 「インストール」を押す。終わったらもう一度 `git --version`。入れば 1.3 へ |
 
-> 📝 **Mac には最初から Git が入っていることが多い。** Xcode Command Line Tools に同梱されているため。バージョンが少し古いことはあるが、学習やふつうの開発には問題ない。
+> 📝 **Mac には最初から Git が入っていることが多い。** Xcode Command Line Tools に同梱されているため。少し古くても、学習やふつうの開発には問題ない。
 
 ---
 
@@ -135,28 +124,12 @@ git --version
 
 ### Mac — Homebrew 経由
 
-```mermaid
-flowchart LR
-    S1["①<br/>Homebrew<br/>インストール"] ==> S2["②<br/>🔑 Macのパスワード<br/>入力"]
-    S2 ==> S3["③<br/>⚠️ 画面に出た<br/>Next steps を実行"]
-    S3 ==> S4["④<br/>brew -v<br/>で確認"]
-    S4 ==> S5["⑤<br/>brew install git"]
-
-    style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S2 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style S3 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style S4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
-```
-
-**操作の要点:**
-
-| ステップ | やること | 注意 |
+| | やること | 注意 |
 | --- | --- | --- |
-| ① | 下のコマンドを1行まるごと貼って Enter | **5〜10分かかる。** 文字が流れ続けるが、待っていればよい |
+| ① | 下のコマンドを貼って Enter | **5〜10分かかる。** 文字が流れ続けるが待つ |
 | ② | Mac のログインパスワードを入力 | 🚨 **打っても画面には1文字も出ない。** そのまま Enter |
-| ③ | 最後に出た `==> Next steps:` の行を実行 | 🚨 **ここだけは自分の画面を見る。** 機種で中身が変わる |
-| ④ | `brew -v` | `Homebrew 4.x.x` と出れば成功 |
+| ③ | 最後に出た `Next steps:` の行を実行 | 🚨 **ここだけは自分の画面を見る**（下で説明） |
+| ④ | `brew -v` で確認 | `Homebrew 4.x.x` と出れば成功 |
 | ⑤ | `brew install git` → `git --version` | |
 
 **① Homebrew のインストール:**
@@ -165,9 +138,9 @@ flowchart LR
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-> 📝 **Homebrew とは**: Mac に開発ツールを入れるための道具。`brew install 〇〇` でツールが入る。この先 `gh`（GitHub CLI）など何度か使う。
+> 📝 **Homebrew とは**: Mac に開発ツールを入れるための道具。`brew install 〇〇` でツールが入る。この先 `gh`（GitHub CLI）でも使う。
 
-> 🚨 **③が最大の詰まりどころ。** インストールが終わると、画面の最後にこう出る。
+**③ 最大の詰まりどころ。** インストールが終わると、画面の最後にこう出る。
 
 ```text
 ==> Next steps:
@@ -177,42 +150,24 @@ flowchart LR
     eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-この**インデントされた行だけ**を選んでコピーし、ターミナルに貼って Enter。
+この**インデントされた行**をコピーして、ターミナルに貼って Enter。
 
-⚠️ **この手順書に書いてある行ではなく、自分の画面に出た行を使う。** Apple シリコンは `/opt/homebrew`、Intel Mac は `/usr/local` と、パスが変わる。
+🚨 **この手順書の行ではなく、自分の画面に出た行を使う。** Apple シリコンは `/opt/homebrew`、Intel Mac は `/usr/local` と、パスが変わる。
 
-> 🚨 **`brew: command not found` が出たら**: ③が終わっていない。上の行を貼り直す。
-
-> 📝 **なぜ2種類の行があるのか**: `echo ... >> ~/.zprofile` は「**次にターミナルを開いたとき**のための設定ファイルへの追記」、`eval "$(...)"` は「**いま開いているターミナル**への即時反映」。役割が違うので両方必要。片方だけだと、閉じたら消える／今は使えない、のどちらかになる。
-
-> 🚨 **それでも `brew` が見つからないときは、ターミナルを開き直す。** Cursor のターミナルパネル右上の 🗑 でいまのターミナルを閉じ、`Ctrl` + `` ` `` でもう一度開く。`.zprofile` が読み直されて `brew` が使えるようになる。
+> 📝 **なぜ2種類の行があるのか**: `echo ... >> ~/.zprofile` は「**次にターミナルを開いたとき**のための設定ファイルへの追記」、`eval "$(...)"` は「**いま開いているターミナル**への即時反映」。役割が違うので両方必要。
 
 ### Windows — 公式インストーラー
 
-```mermaid
-flowchart LR
-    S1["①<br/>git-scm.com から<br/>exe をダウンロード"] ==> S2["②<br/>ダブルクリック"]
-    S2 ==> S3["③<br/>PATH の設定<br/>(真ん中を選ぶ)"]
-    S3 ==> S4["④<br/>他はデフォルトで<br/>Next → Install"]
-    S4 ==> S5["⑤<br/>PowerShellで<br/>git --version"]
-
-    style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S3 fill:#E74C3C,color:#FFFFFF,stroke:#333,stroke-width:3px
-    style S4 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
-```
-
-**選択肢が出る画面だけ、選ぶものを決めておく:**
+[git-scm.com](https://git-scm.com/) から `Git-*.exe` をダウンロードして実行する。**選択肢が出る画面だけ、選ぶものを決めておく。**
 
 | 画面 | 選ぶもの | なぜ |
 | --- | --- | --- |
-| Adjusting your PATH environment | **Git from the command line and also from 3rd-party software**（真ん中） | PowerShell でも VSCode でも Git が使える |
+| Adjusting your PATH environment | **Git from the command line and also from 3rd-party software**（真ん中） | PowerShell でも Cursor でも Git が使える |
 | Choosing HTTPS transport backend | **Use the native Windows Secure Channel library** | Windows の証明書をそのまま使える |
-| Configuring the line ending conversions | **Checkout Windows-style, commit Unix-style**（既定） | 1.3 の `core.autocrlf` と同じ効果 |
+| Configuring the line ending conversions | **Checkout Windows-style, commit Unix-style**（既定） | 改行コードの違いを自動で吸収する |
 | それ以外 | すべて既定のまま Next | 変える理由がない |
 
-> 🚨 **インストールが終わったら Cursor を再起動する。** Windows は起動中のアプリに PATH の変更が届かないため、再起動しないと Cursor のターミナルで `git --version` が `command not found` のままになる。
+> 🚨 **終わったら Cursor を再起動する。** Windows は起動中のアプリに PATH の変更が届かない。
 
 > 📝 Git for Windows には **Git Credential Manager** が同梱されている。Part 2 の認証が、初回 push のときにブラウザが開いて終わる。
 
@@ -222,7 +177,7 @@ flowchart LR
 
 コミットに「誰がやったか」を刻むための設定。🚨 **これをしないとコミットできない。**
 
-**1行ずつ**貼って、`<>` の部分を自分の値に置き換えてから Enter。
+**1行ずつ**貼って、`<>` を自分の値に置き換えてから Enter。
 
 ```sh
 git config --global user.name "<あなたの名前>"
@@ -245,35 +200,15 @@ git config --global --list
 | `user.name` | コミット履歴に出る名前 | 本名でもハンドルネームでもよい |
 | `user.email` | コミット履歴に出るメール | 🚨 Part 2 で GitHub を使うなら、**GitHub に登録したメールと同じにする** |
 
-> 🚨 **メールアドレスは公開される。** GitHub に上げると、コミット履歴から誰でも見える。隠したい場合は GitHub の `noreply` アドレス（`12345678+username@users.noreply.github.com`）を使う。GitHub の Settings → Emails → **Keep my email addresses private** で確認できる。
+> 🚨 **メールアドレスは公開される。** GitHub に上げると、コミット履歴から誰でも見える。隠したい場合は GitHub の `noreply` アドレス（`12345678+username@users.noreply.github.com`）を使う。Settings → Emails → **Keep my email addresses private** で確認できる。
 
 > 🚨 **ここが違うと、自分のコミットとして数えられない。** GitHub の自分のページに出る活動記録（緑のマス目）が増えず、コミットの横に自分のアイコンも出ない。あとから直すのは面倒なので、Part 2 をやる予定があるなら最初から揃えておく。
 
-**改行コードの設定（Windows のみ）:**
-
-```sh
-git config --global core.autocrlf true
-```
-
-> 📝 Windows と Mac / Linux で改行の文字が違う。これを入れておくと「**1文字も直していないのに全行が変更扱いになる**」が起きにくい。
+> 📝 **Windows でインストーラーの改行設定を既定のまま進めたなら、追加の設定は要らない。** 変えてしまった場合だけ `git config --global core.autocrlf true` を実行する。
 
 ---
 
 ## 1.4 最初のコミット
-
-```mermaid
-flowchart LR
-    S1["①<br/>Cursorで<br/>フォルダを開く"] ==> S2["②<br/>.gitignore<br/>を作る"]
-    S2 ==> S3["③<br/>git init<br/>履歴を取る対象にする"]
-    S3 ==> S4["④<br/>git add .<br/>記録する候補に入れる"]
-    S4 ==> S5["⑤<br/>git commit<br/>セーブする"]
-
-    style S1 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S2 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style S4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
-```
 
 ### ① フォルダを開く — `cd` は打たない
 
@@ -281,7 +216,8 @@ flowchart LR
 
 | | やること |
 | --- | --- |
-| 開き方 | Cursor 上部メニューの **ファイル** → **フォルダを開く** → 自分のプロジェクトのフォルダを選ぶ |
+| フォルダが無い人 | 先にデスクトップなどに**新しいフォルダを1つ作る**（名前は `my-app` など半角英数字で） |
+| 開き方 | Cursor 上部メニューの **ファイル** → **フォルダを開く** → そのフォルダを選ぶ |
 | 開いたあと | ターミナルを開き直す（`Ctrl` + `` ` ``） |
 
 いま自分がどこにいるかを確認する:
@@ -292,7 +228,7 @@ pwd
 
 → **自分のプロジェクトのフォルダ名で終わっていればOK。**
 
-> 🚨 **ここが違うと、関係ないフォルダの履歴を取り始める。** `pwd` の結果が `/Users/あなたの名前` で終わっていたら、フォルダを開けていない。開き方からやり直す。
+> 🚨 **ここが違うと、関係ないフォルダの履歴を取り始める。** `/Users/あなたの名前` で終わっていたら、フォルダを開けていない。開き方からやり直す。
 
 ### ② `.gitignore` を作る — `git add` より先に
 
@@ -315,7 +251,7 @@ node_modules/
 
 > 🚨 **一度 `commit` したファイルは、あとから `.gitignore` に書いても記録され続ける。** だから `git add` より先に作る。
 
-### ③〜⑤ 履歴を取り始める
+### ③ 履歴を取り始める
 
 **1行ずつ**貼って Enter。
 
@@ -345,7 +281,7 @@ git commit -m "最初のコミット"
 git log --oneline
 ```
 
-→ `a1b2c3d 最初のコミット` のように1行出れば成功。
+→ `a1b2c3d 最初のコミット` のように出れば成功。
 
 | コマンド | 意味 |
 | --- | --- |
@@ -377,8 +313,6 @@ git diff
 git restore <ファイル名>
 ```
 
-→ `<ファイル名>` は自分の値に置き換える。例: `git restore index.html`
-
 **編集を全部捨てて戻す:**
 
 ```sh
@@ -386,6 +320,8 @@ git restore .
 ```
 
 > 🚨 **`git restore` は編集を消す。取り消せない。** 残したい変更があるなら、先に `git commit` する。**迷ったら必ず `git diff` で中身を見てから。**
+
+> 📝 **新しく作ったファイルは消えない。** `git restore .` が戻すのは「すでに記録されたことがあるファイルへの編集」だけ。新規ファイルはそのまま残るので、不要なら手で削除する。
 
 > 📝 **AI にコードを書き換えてもらうなら、指示を出す前に1回 `commit` しておくのがいちばん安い保険。** 気に入らなければ `git restore .` で指示前に戻る。
 
@@ -419,27 +355,25 @@ git restore .
 
 ## 2.1 アカウントを作る
 
-| ステップ | やること | 注意 |
+| | やること | 注意 |
 | --- | --- | --- |
-| ① | [github.com](https://github.com) で Sign up | 画面の案内どおりで迷わない |
+| ① | [github.com](https://github.com) で Sign up | 画面の案内のとおりで迷わない |
 | ② | メールアドレスを認証 | 🚨 **1.3 の `user.email` と同じメールにする**（違う場合は Settings → Emails で追加登録する） |
 | ③ | 2要素認証（2FA）を設定 | 必須。下を読む |
 
-### ③ 2要素認証（2FA）— ここだけ丁寧に
+**③ 2要素認証（2FA）— ここだけ丁寧に**
 
 🚨 **GitHub は 2FA が必須。** 設定しないまま使い続けると、アカウントが制限される。
 
-| ステップ | やること |
+| | やること |
 | --- | --- |
 | 1 | スマホに認証アプリを入れる（**Google Authenticator** / **Microsoft Authenticator** / 1Password など） |
 | 2 | GitHub の **Settings** → **Password and authentication** → **Enable two-factor authentication** |
 | 3 | 画面に出た QRコードを、認証アプリで読み取る |
 | 4 | アプリに出た6桁の数字を GitHub に入力 |
-| 5 | 🔴 **リカバリーコード（16個の文字列）が表示される。必ずダウンロードして保存する** |
+| 5 | 🔴 **リカバリーコードが表示される。必ずダウンロードして保存する** |
 
 > 🚨 **5を飛ばさない。** スマホを機種変更したり失くしたりすると、**リカバリーコードが無い限りアカウントに二度と入れなくなる。** パスワードマネージャーに入れるか、印刷して手元に置く。
-
-> 📝 SMS でも設定できるが、認証アプリのほうが安全で、電波が無くても使える。
 
 ---
 
@@ -450,22 +384,17 @@ git restore .
 | 方法 | 手間 | 向き |
 | --- | --- | --- |
 | 🅰️ **GitHub CLI**（`gh auth login`） | **2分** | 🟢 まずこれ。自分でトークンを保管しなくてよい |
-| 🅱️ VSCode / Cursor のサインイン | 3分 | エディタの中で完結させたい |
+| 🅱️ Cursor / VSCode のサインイン | 3分 | エディタの中で完結させたい |
 | 🅲 パーソナルアクセストークン（PAT） | 10分 | CLI が入れられない環境 / CI |
 
 ### 🅰️ GitHub CLI（推奨）
-
-**Mac — `gh` を入れる:**
 
 ```sh
 brew install gh
 ```
 
-> 🚨 **`brew: command not found` と出たら、Homebrew が入っていない。** 1.1 で Git がすでに入っていた人は、1.2 を飛ばしているのでこの状態になる。**1.2 の「Mac — Homebrew 経由」の ①〜④ だけ**をやってから戻ってくる（`brew install git` は不要）。
-
-**Windows:** Git for Windows 同梱の Credential Manager でもよい（初回 push でブラウザが開いて終わる）。`gh` を使うなら `winget install GitHub.cli`。
-
-**ログインする:**
+> 🚨 **`brew: command not found` と出たら、Homebrew が入っていない。** 1.1 で Git がすでに入っていた人はこの状態になる。**1.2 の「Mac — Homebrew 経由」の ①〜④ だけ**をやってから戻る（`brew install git` は不要）。
+> 📝 **Windows** は Git Credential Manager でもよい（初回 push でブラウザが開いて終わる）。`gh` を使うなら `winget install GitHub.cli`。
 
 ```sh
 gh auth login
@@ -480,13 +409,7 @@ gh auth login
 | Authenticate Git with your GitHub credentials? | **Yes** |
 | How would you like to authenticate GitHub CLI? | **Login with a web browser** |
 
-→ 8桁のコードが表示される。Enter でブラウザが開くので、そのコードを貼って承認。
-
-確認:
-
-```sh
-gh auth status
-```
+→ 8桁のコードが表示される。Enter でブラウザが開くので、そのコードを貼って承認。確認は `gh auth status`。
 
 > 📝 **順番はバージョンで少し変わる。** 聞かれた内容で判断する。
 > 🚨 `Authenticate Git with your GitHub credentials?` を **Yes** にしないと、`gh` のログインは通るのに `git push` だけ失敗する。
@@ -509,43 +432,23 @@ GitHub → Settings → Developer settings → Personal access tokens → **Fine
 | 🟢 **90日（おすすめ）** | ふだんの学習・個人開発 | 90日ごとに作り直す（2分） |
 | ⚠️ `No expiration` | 作り直す手間を絶対に避けたい | **漏れたら、自分で消すまで永久に有効** |
 
-> 🟢 **期限を切るのをすすめる理由はひとつ。** トークンは、うっかりコードに書いてしまったり、画面共有に映ったりして漏れることがある。**期限があれば、漏れたことに気づかないままでも、いつかは自然に無効になる。** 無期限だと、使える鍵が外に出たままになる。
+> 🟢 **期限を切るのをすすめる理由はひとつ。** トークンは、うっかりコードに書いてしまったり、画面共有に映ったりして漏れることがある。**期限があれば、漏れたことに気づかないままでも、いつかは自然に無効になる。**
 
-> 📝 **期限切れは、知っていれば怖くない。** 切れたときに起きるのは `fatal: Authentication failed for 'https://github.com/...'` が出て `git push` が止まることだけで、**壊れたわけでも、履歴が消えたわけでもない。** 同じ手順で作り直せば2分で戻る。期限が近づくと GitHub からメールも届く。
+> 📝 **期限切れは、知っていれば怖くない。** 起きるのは `fatal: Authentication failed` が出て push が止まることだけで、**壊れたわけでも履歴が消えたわけでもない。** 作り直せば2分で戻る。期限が近づくと GitHub からメールも届く。
 
-> 📝 **Repository access は All repositories でよい。** Only select にすると、**新しくリポジトリを作るたびにトークンの設定を変えに行く**ことになり、そのたびに push が止まる。
+> 📝 **Repository access は All repositories でよい。** Only select にすると、新しくリポジトリを作るたびに設定を変えに行くことになる。
 
-> 🚨 **そのかわり、Permissions は必要な1つだけにする。** `Contents: Read and write` だけ付けておけば、仮に漏れても**ファイルの読み書き**までで止まる。⛔ Administration（リポジトリの削除）や Secrets には触らせない。
+> 🚨 **そのかわり、Permissions は必要な1つだけにする。** `Contents: Read and write` だけなら、仮に漏れても**ファイルの読み書き**までで止まる。⛔ Administration（リポジトリの削除）や Secrets には触らせない。
 
-> 🚨 **漏らしたかもしれないと思ったら、すぐ Delete する。** **Settings → Developer settings → Fine-grained tokens** から消せば、**その瞬間に無効**になる。期限を待つ必要はない。Token name を使う場所の名前にしておくと、どれを消せばよいかが分かる。
+🚨 **表示されたトークンは一度しか見られない。** その場でパスワードマネージャーに保存する。push 時に聞かれたら、Username は GitHub のユーザー名、**Password の欄にトークンを貼る**。
 
-🚨 **表示されたトークンは一度しか見られない。** その場でパスワードマネージャーに保存する。
-
-> 📝 **失くしても作り直せばよい。** 消して新しく発行するだけで、リポジトリには何も起きない。
-> 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は `repo` にチェックを入れた時点で、コードの読み書きだけでなく**リポジトリの削除・設定変更・Webhook まで全部できる**トークンになる。fine-grained なら `Contents` だけに絞れる。
+> 🚨 **漏らしたかもしれないと思ったら、すぐ Delete する。** Fine-grained tokens の画面から消せば、**その瞬間に無効**になる。期限を待つ必要はない。
+> 🚨 **`Tokens (classic)` ではなく `Fine-grained tokens` を使う。** classic は `repo` にチェックを入れた時点で、コードの読み書きだけでなく**リポジトリの削除・設定変更・Webhook まで全部できる**トークンになる。
 > 🚨 **トークンを `.env` やコードに書かない。** 一度 commit すると履歴に残り続ける。
-
-> 📝 **会社や学校のアカウントだと、期限の上限が組織のポリシーで決まっていることがある。** `No expiration` が出てこない場合はそれが理由。選べるなかで一番長いものを選ぶ。
-
-push 時に聞かれたら、Username は GitHub のユーザー名、**Password の欄にトークンを貼る**。
 
 ---
 
 ## 2.3 リポジトリを作って push
-
-```mermaid
-flowchart LR
-    S1["①<br/>GitHub上に<br/>リポジトリを作る"] ==> S2["②<br/>git remote add origin<br/>場所を教える"]
-    S2 ==> S3["③<br/>git branch -M main<br/>名前を揃える"]
-    S3 ==> S4["④<br/>git push -u origin main"]
-    S4 ==> S5["⑤<br/>ブラウザで<br/>見えるか確認"]
-
-    style S1 fill:#8E44AD,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S2 fill:#3498DB,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S3 fill:#F4C430,color:#000,stroke:#333,stroke-width:2px
-    style S4 fill:#16A085,color:#FFFFFF,stroke:#333,stroke-width:2px
-    style S5 fill:#27AE60,color:#FFFFFF,stroke:#333,stroke-width:2px
-```
 
 **GitHub CLI があるなら1行で済む:**
 
@@ -553,15 +456,13 @@ flowchart LR
 gh repo create my-app --private --source=. --remote=origin --push
 ```
 
-**手でやる場合:**
-
-まず GitHub 上で**空の**リポジトリを作る（**README にチェックを入れない**）。そのあと、**1行ずつ**貼る。
+**手でやる場合:** まず GitHub 上で**空の**リポジトリを作る（**README にチェックを入れない**）。そのあと**1行ずつ**貼る。
 
 ```sh
 git remote add origin https://github.com/<ユーザー名>/<リポジトリ名>.git
 ```
 
-→ `<>` の部分は自分の値に置き換える。GitHub のリポジトリ画面に出ている URL をそのままコピーするのが確実。
+→ GitHub のリポジトリ画面に出ている URL をそのままコピーするのが確実。
 
 ```sh
 git branch -M main
@@ -571,13 +472,40 @@ git branch -M main
 git push -u origin main
 ```
 
-> 🚨 **最初は `--private` にする。** 公開は後からいつでも切り替えられるが、一度公開したものは取り消せない。API キーなどを混ぜていた場合に手遅れになる。
+> 🚨 **最初は `--private` にする。** 公開は後からいつでも切り替えられるが、**一度公開したものは取り消せない。** APIキーなどを混ぜていた場合に手遅れになる。
 
 > 📝 2回目以降は `git push` だけでよい（`-u` で紐づけ済みのため）。
 
 ---
 
-## 2.4 詰まったときの対処表
+### ✅ Part 2 のチェック
+
+- [ ] `gh auth status` が通る（または初回 push が成功した）
+- [ ] ブラウザで自分のリポジトリにファイルが見える
+- [ ] 適当に1行変えて `commit` → `push` が通る
+- [ ] GitHub 上でそのコミットが**自分のアイコン付き**で出ている
+
+---
+
+## 困ったとき
+
+エラーメッセージや症状から引く。**ここに無いものは、1.0 の「詰まったら、AI に聞く」。**
+
+### Part 1 — Git
+
+| 症状 | 原因 | 対処 |
+| --- | --- | --- |
+| 画面が文字で埋まって止まった | 出力が長く、ページャが開いた | **`q` を押す。** 壊れていない |
+| パスワードを打っても1文字も出ない | 仕様 | **そのまま打って Enter。** 正しく入力されている |
+| `command not found: git` | Git が入っていない | 1.2 |
+| `brew: command not found` | Homebrew が入っていない、または PATH が通っていない | 1.2 の ③ をやる。それでも駄目ならターミナルを開き直す |
+| Windows: インストールしたのに `git` が見つからない | PATH が届いていない | **Cursor を再起動する** |
+| `Please tell me who you are` | `user.name` / `user.email` が未設定 | 1.3 |
+| `git status` に `.env` が出る | `.gitignore` に書けていない | 1.4 の ② |
+| `pwd` が `/Users/あなたの名前` で終わる | フォルダを開けていない | 1.4 の ① |
+| `git restore .` したのにファイルが残る | 新規作成したファイルは対象外 | 手で削除する |
+
+### Part 2 — GitHub
 
 | 出たメッセージ | 原因 | 対処 |
 | --- | --- | --- |
@@ -590,15 +518,6 @@ git push -u origin main
 | `Repository not found` | URL のタイポ、または private への権限不足 | `git remote -v` で URL を確認 |
 | push は成功したが自分のコミットとして出ない | `user.email` が GitHub のメールと違う | 1.3 を直す（過去分は残る） |
 | `gh` は通るのに `git push` で聞かれる | `Authenticate Git with your GitHub credentials?` を No にした | `gh auth login` をやり直す |
-
----
-
-### ✅ Part 2 のチェック
-
-- [ ] `gh auth status` が通る（または初回 push が成功した）
-- [ ] ブラウザで自分のリポジトリにファイルが見える
-- [ ] 適当に1行変えて `commit` → `push` が通る
-- [ ] GitHub 上でそのコミットが**自分のアイコン付き**で出ている
 
 ---
 
