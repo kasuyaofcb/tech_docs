@@ -19,7 +19,8 @@
 | 04b' | Azure 環境構築手順 | アカウント開設→デプロイ完了までの一連の流れ（CI/CDは GH Actions / Azure Pipelines、DBは Supabase / Azure SQL / PostgreSQL から選択） | [04b_azure/setup.md](04b_azure/setup.md) |
 | 04b" | Azure DevOps | Microsoft版GitHub（Repos / Pipelines / Boards 等）の全体像とGitHub対応表、並行運用パターン | [04b_azure/devops.md](04b_azure/devops.md) |
 | 05 | スマホ開発ワークフロー | AIアシスタント × クラウドGit でスマホからコミット・push まで進める方法 | [05_mobile-workflow/mobile-workflow.md](05_mobile-workflow/mobile-workflow.md) |
-| 05' | スマホから Claude Code を使う手順 | リモートコントロールで外出先からPCのClaudeに頼む（Part 1）／PCを閉じてもGitHub経由で頼む（Part 2）。**Part 1 だけで使い始められる** | [05_mobile-workflow/setup.md](05_mobile-workflow/setup.md) |
+| 05' | スマホから PC の Claude Code を動かす手順 | リモートコントロール。PCをつけたままにして外出先から頼む。**GitHub不要・今日から使える** | [05_mobile-workflow/setup.md](05_mobile-workflow/setup.md) |
+| 05" | スマホだけで Claude Code に頼む手順 | GitHub × Claude Code on the web。**PCを閉じていても**頼める。結果はブランチ→PRでmainへ | [05_mobile-workflow/setup-web.md](05_mobile-workflow/setup-web.md) |
 
 > 📖 **推奨学習順**: 01 → 02 → 03 → 04a または 04b（配信先は二者択一）→ 05 (補足)
 >
