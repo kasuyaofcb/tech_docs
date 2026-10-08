@@ -79,7 +79,7 @@ flowchart LR
 
 ## 1. Claude と GitHub をつなぐ 【一生に1回・PC で】
 
-Git 環境構築手順で `gh`（GitHub をターミナルから使う道具）にログインしてあれば、**Claude に1行打つだけ**でつながる。
+Git 環境構築手順（2.2）で `gh`（GitHub をターミナルから使う道具。GitHub CLI とも呼ぶ）にログインしてあれば、**Claude に1行打つだけ**でつながる。
 
 1. Cursor でターミナルを開く（開き方は [Git 環境構築手順「ターミナルを開く」](../02_git/setup.md#ターミナルを開く)）
 2. ターミナルに `claude` と打って Enter（Claude が起動する）
@@ -93,12 +93,9 @@ Git 環境構築手順で `gh`（GitHub をターミナルから使う道具）�
 
 ![/web-setup と打つと候補が出る](images/web-setup-cmd.png)
 
-4. 「`gh` の情報を Claude のアカウントに送ってよいか」と聞かれるので、許可する
+4. 「**GitHub のログイン情報**（`gh` に保存されているもの）を、Claude のアカウントに送ってよいか」と聞かれるので、許可する
+   - Git 環境構築手順で `gh` にログインしたときの情報を、クラウドの Claude にも使わせる、という意味。GitHub に改めてログインしなくて済む
 5. **`Connected as （自分の GitHub のユーザー名）`** と出て、ブラウザで claude.ai/code が開けば完了
-
-> 💡 **「Connect cloud sessions to GitHub?」と出て、「You're already connected via the GitHub App」と書いてあるとき**は、すでにブラウザで GitHub とつないである。スマホでリポジトリを選べているなら、↓ キーで **「2. Cancel」** を選んで Enter（今のつなぎ方のまま使う）。
->
-> ![すでにつないである場合の画面。2. Cancel を選ぶ](images/web-setup-already.png)
 
 > ⚠️ これで、**自分の GitHub のリポジトリ全部**を、クラウドの Claude が扱えるようになる。ただし、Claude が触るのは**自分でセッションを始めて選んだリポジトリだけ**。
 
@@ -219,11 +216,16 @@ git pull
 | こうなった | こうする |
 | --- | --- |
 | `/web-setup` と打っても「No commands match」と出る | Claude に有料プランのアカウントでログインしていない。Claude の入力欄で `/login` と打ってログインし直す |
+| `/web-setup` で「Connect cloud sessions to GitHub?」「You're already connected via the GitHub App」と出る | 前にブラウザで GitHub とつないだことがある。スマホでリポジトリを選べているなら、↓ キーで「2. Cancel」を選んで Enter（今のつなぎ方のまま使う）。画面は[下の画像](#すでにつないである場合の画面) |
 | `/web-setup` で `gh` のエラーが出る | ターミナルで `gh auth status` と打ち、GitHub にログインしているか確認（[Git 環境構築手順 2.2](../02_git/setup.md)） |
 | スマホでリポジトリが一覧に出ない | ターミナルで `gh repo view 自分のユーザー名/リポジトリ名` と打って見えるか確認。見えるなら、Claude で `/web-setup` をもう一度 |
 | 「Create PR」が見つからない | GitHub でリポジトリを開く →「Pull requests」タブ →「New pull request」→ Claude が作ったブランチ（`claude/` で始まる名前）を選ぶ |
 | PC に変更が入ってこない | 4 のマージをしたか確認 → 5 の `git pull` |
 | `git pull` でエラーが出る | PC で編集したまま保存していない変更がある。Claude（PC）に「git pull したらこのエラーが出た」とエラー文を貼って聞く |
+
+### すでにつないである場合の画面
+
+![すでにつないである場合の画面。2. Cancel を選ぶ](images/web-setup-already.png)
 
 ---
 
