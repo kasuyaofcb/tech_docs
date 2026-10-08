@@ -1,6 +1,6 @@
 # スマホだけで Claude Code に頼む手順 — GitHub × Claude Code on the web
 
-> 📝 [mobile-workflow.md](mobile-workflow.md) の考え方を、実際に手を動かす順番にしたもの。プロジェクトを GitHub に置いておき、Claude が**クラウド上で**作業する。**PC を閉じていても、スマホだけで作業を頼める。**
+> 📝 [mobile-workflow.md](mobile-workflow.md) の考え方を、実際に手を動かす順番にしたもの。プロジェクトを GitHub に置いておき、Claude が**クラウド上で**作業する。**PC を閉じていても、電源を切っていても、スマホだけで作業を頼める。**
 >
 > まだ GitHub を使っていない人は、先に [setup.md](setup.md)（リモートコントロール）で十分。PC をつけたままにしておけば、GitHub なしでスマホから頼める。
 
@@ -14,8 +14,9 @@
 
 | 必要なもの | まだの場合 |
 | --- | --- |
-| Claude の有料プラン（Pro 以上） | claude.ai でプランを変更 |
+| Claude の**有料プラン（Pro 以上）** | [claude.ai](https://claude.ai) でプランを変更。**無料プランでは使えない** |
 | GitHub アカウント | [Git 環境構築手順 2.1](../02_git/setup.md) |
+| PC の `gh` で GitHub にログイン済み | [Git 環境構築手順 2.2](../02_git/setup.md) |
 | プロジェクトが GitHub に push 済み | [Git 環境構築手順 2.3](../02_git/setup.md) |
 | スマホの Claude アプリ | [setup.md 1.1](setup.md) |
 
@@ -56,47 +57,54 @@ flowchart LR
 
 > 💡 **PC のフォルダは、スマホで頼んだ時点では変わらない。** 変わるのは GitHub の上だけ。PC に反映させるのは、帰ってから（手順 5）。
 
+### リモートコントロール（setup.md）との違い
+
+| | この資料（Claude Code on the web） | [setup.md](setup.md)（リモートコントロール） |
+| --- | --- | --- |
+| 作業する場所 | Anthropic のクラウド | 自分の PC |
+| 外出中の PC | **閉じても・電源を切ってもよい** | ふたを開けて、電源につないで、Claude を起動したまま |
+| 使えるファイル | GitHub に置いたものだけ | PC にあるもの全部 |
+| スマホから新しく始める | **できる**（リポジトリを選ぶだけ） | できない（PC で起動した Claude の続きだけ） |
+| 結果が PC に入るまで | GitHub で取り込んで、`git pull` する | すぐ入る |
+
 ### どれを何回やる？
 
 | 頻度 | やること | 節 |
 | --- | --- | --- |
-| **【一生に1回】** | claude.ai/code と GitHub をつなぐ | 1 |
-| **【リポジトリごとに1回】** | 使うリポジトリを Claude に許可する | 1 の ③ |
+| **【一生に1回】** | Claude と GitHub をつなぐ | 1 |
 | **【毎回】** | スマホから頼む → 結果を確認 | 2 / 3 |
 | **【取り込むとき】** | PC で main に取り込み、PC に持ってくる | 4 / 5 |
 
 ---
 
-## 1. GitHub とつなぐ 【一生に1回・PC で】
+## 1. Claude と GitHub をつなぐ 【一生に1回・PC で】
 
-スマホでもできるが、画面が広い **PC のブラウザ**でやる方が迷わない。
+Git 環境構築手順で `gh`（GitHub をターミナルから使う道具）にログインしてあれば、**Claude に1行打つだけ**でつながる。
 
-① [claude.ai/code](https://claude.ai/code) を開き、Claude のアカウントでログインする
+1. Cursor でターミナルを開く（開き方は [Git 環境構築手順「ターミナルを開く」](../02_git/setup.md#ターミナルを開く)）
+2. ターミナルに `claude` と打って Enter（Claude が起動する）
+3. Claude の入力欄に次の1行を打って Enter
 
-② **「Sign in with GitHub」** を押し、GitHub の画面で **Authorize（許可）** を押す
+```text
+/web-setup
+```
 
-<!-- TODO(PCのスクショ): claude.ai/code の Sign in with GitHub ボタン -->
-![claude.ai/code の Sign in with GitHub](images/web-github-signin.png)
+4. 「`gh` の情報を Claude のアカウントに送ってよいか」と聞かれるので、許可する
+5. **`Connected as （自分の GitHub のユーザー名）`** と出て、ブラウザで claude.ai/code が開けば完了
 
-③ 使いたいリポジトリが一覧に出てこないときは、[Claude の GitHub App](https://github.com/apps/claude/installations/new) をインストールする
-- **「Only select repositories」** を選ぶ
-- 使うリポジトリ**だけ**を選んで **Install**
+<!-- TODO(PCのスクショ): /web-setup の実行結果。Connected as の行に赤枠（ユーザー名はマスク） -->
 
-<!-- TODO(PCのスクショ): GitHub App インストール画面。Only select repositories に赤枠 -->
-![GitHub App のインストール。Only select repositories を選ぶ](images/web-github-app.png)
+> ⚠️ これで、**自分の GitHub のリポジトリ全部**を、クラウドの Claude が扱えるようになる。ただし、Claude が触るのは**自分でセッションを始めて選んだリポジトリだけ**。
 
-> 🚨 「All repositories」を選ぶと、**すべてのリポジトリを Claude が読めるようになる**。使うものだけを選ぶ。あとから増やすのは簡単（GitHub の Settings → Applications）。
+> ⚠️ リポジトリに `.env` などのパスワード・APIキーが入っていると、Claude からも読めてしまう。**秘密の情報は先に GitHub から外しておく**（[git.md §8](../02_git/git.md)）。
 
-> 🚨 リポジトリに `.env` などのパスワード・APIキーが入っていると、Claude からも読めてしまう。**秘密の情報は先に GitHub から外しておく**（[git.md §8](../02_git/git.md)）。
-
-④ claude.ai/code の画面で、リポジトリの一覧に**自分のリポジトリが出れば完了**
-
-<!-- TODO(PCのスクショ): claude.ai/code のリポジトリ選択に自分のリポジトリが出ている画面 -->
-![リポジトリが一覧に出た](images/web-repo-list.png)
+> 💡 `/web-setup` がうまくいかないときは、[付録 A](#付録-a--ブラウザでつなぐ)（ブラウザでつなぐ方法）を使う。
 
 ---
 
 ## 2. スマホから頼む 【毎回】
+
+**セッション**は、Claude との1つの会話のこと。頼みごとをするたびに、新しいセッションを作る。
 
 ① スマホの Claude アプリで **「Code」** を開く
 
@@ -120,16 +128,17 @@ memo.md を作って、「スマホから書きました」と1行書いて
 
 > 💡 頼んだら**アプリを閉じてよい**。Claude はクラウドで作業を続けるので、PC もスマホも閉じていて大丈夫。終わったらアプリで確認できる。
 
+> 💡 クラウドの Claude は、ファイルを変えるたびに許可を求めてこない。作業はすべて**別のブランチ**に入るので、`main` が勝手に書き換わることはない。
+
 ---
 
 ## 3. 結果を確認する 【毎回】
 
-① Claude アプリの同じセッションを開くと、**何をどう変えたか**が出ている
+① Claude アプリの「Code」で、さっきのセッション（**雲のアイコン**がついたもの）を開く
 
-② 作業結果は GitHub の**新しいブランチ**に保存されている（ブランチ名もセッションに出る）
+② **何をどう変えたか**が出ている。作業結果は GitHub の**新しいブランチ**に保存されている（ブランチ名もセッションに出る）
 
 <!-- TODO(スマホのスクショ): 作業完了後のセッション画面。変更内容とブランチ名に赤枠 -->
-![作業が終わったセッション。ブランチ名が出る](images/app-web-done.png)
 
 ③ 直してほしいところがあれば、**同じセッションで続けて頼む**（同じブランチに追加される）
 
@@ -139,23 +148,25 @@ memo.md を作って、「スマホから書きました」と1行書いて
 
 ## 4. main に取り込む 【取り込むとき・PC で】
 
-差分をしっかり見るために、**PC で**やる。
+差分をしっかり見るために、**PC のブラウザ**でやる。
 
-① GitHub でリポジトリを開く → 上に出る **「Compare & pull request」** を押す
+① PC のブラウザで [claude.ai/code](https://claude.ai/code) を開き、さっきのセッションを開く
 
-<!-- TODO(PCのスクショ): GitHub の Compare & pull request ボタン -->
-![GitHub の Compare & pull request](images/gh-compare-pr.png)
+② 画面に出ている **`+1 -0` のような数字**（増えた行・減った行の数）を押す → 変わった中身が表示される
 
-② **「Files changed」** タブで、変わった中身を確認する
+③ 中身を確認して、よければ上の **「Create PR」** を押す → GitHub にプルリクエスト（PR）ができる
 
-③ よければ **「Merge pull request」** → **「Confirm merge」**
+<!-- TODO(PCのスクショ): claude.ai/code の差分画面。+1 -0 と Create PR に赤枠 -->
 
-<!-- TODO(PCのスクショ): Merge pull request ボタン -->
-![Merge pull request](images/gh-merge.png)
+④ できた PR を GitHub で開き、**「Merge pull request」** → **「Confirm merge」** を押す
+
+<!-- TODO(PCのスクショ): GitHub の PR 画面。Merge pull request に赤枠 -->
+
+⑤ 「Delete branch」というボタンが出たら、押してよい（Claude が作ったブランチを片付けるだけ。main には影響しない）
 
 > 💡 プルリクエスト（PR）は「このブランチの変更を main に入れてよいですか？」という確認の場。考え方は [git.md §3〜§4](../02_git/git.md)。
 
-> ⚠️ 中身がよく分からないときは、**マージしない**。Claude の Code のセッションで「この変更を分かりやすく説明して」と頼めばよい。
+> ⚠️ 中身がよく分からないときは、**マージしない**。同じセッションで「この変更を分かりやすく説明して」と頼めばよい。
 
 ---
 
@@ -171,15 +182,16 @@ git pull
 `memo.md` が Cursor のファイル一覧に出れば完了。
 
 <!-- TODO(PCのスクショ): git pull 後、Cursor に memo.md が出ている画面 -->
-![PCにmemo.mdが来た](images/web-goal.png)
 
 > 💡 [setup.md](setup.md) のリモートコントロールと違って、**PC には自動で入ってこない**。PC で作業を始める前に、毎回 `git pull` しておくのが習慣。
+
+> 💡 テストで作った `memo.md` は、スマホから「memo.md を消して」と頼み、同じ流れ（3〜5）で取り込めば消せる。流れの練習にもなる。
 
 ---
 
 ### 🎉 ゴール
 
-- PC を閉じたまま、スマホの Claude アプリ →「Code」→ リポジトリを選んで頼める
+- PC を閉じたまま、スマホの Claude アプリ →「Code」→「＋ 新規セッション」→ リポジトリを選んで頼める
 - 結果は別のブランチに入り、PC で確認してから main に取り込める
 - `git pull` で PC にも反映できる
 
@@ -189,10 +201,31 @@ git pull
 
 | こうなった | こうする |
 | --- | --- |
-| リポジトリが一覧に出ない | 1 の ③。GitHub App で、そのリポジトリを許可したか確認 |
-| 「Compare & pull request」が出ない | GitHub の **Pull requests** タブ →「New pull request」→ Claude が作ったブランチを選ぶ |
+| `/web-setup` と打っても「No commands match」と出る | Claude に有料プランのアカウントでログインしていない。Claude の入力欄で `/login` と打ってログインし直す |
+| `/web-setup` で `gh` のエラーが出る | ターミナルで `gh auth status` と打ち、GitHub にログインしているか確認（[Git 環境構築手順 2.2](../02_git/setup.md)） |
+| スマホでリポジトリが一覧に出ない | ターミナルで `gh repo view 自分のユーザー名/リポジトリ名` と打って見えるか確認。見えるなら、Claude で `/web-setup` をもう一度 |
+| 「Create PR」が見つからない | GitHub でリポジトリを開く →「Pull requests」タブ →「New pull request」→ Claude が作ったブランチ（`claude/` で始まる名前）を選ぶ |
 | PC に変更が入ってこない | 4 のマージをしたか確認 → 5 の `git pull` |
 | `git pull` でエラーが出る | PC で編集したまま保存していない変更がある。Claude（PC）に「git pull したらこのエラーが出た」とエラー文を貼って聞く |
+
+---
+
+## 付録 A — ブラウザでつなぐ
+
+`/web-setup` がうまくいかないときだけ使う。
+
+① PC のブラウザで [claude.ai/code](https://claude.ai/code) を開き、Claude のアカウントでログインする
+
+② GitHub とつなぐように案内が出るので、そのとおりに進み、GitHub の画面で **Authorize（許可）** を押す
+
+③ **非公開（Private）のリポジトリを使うときは**、[Claude の GitHub App](https://github.com/apps/claude/installations/new) をインストールする
+
+- **「Only select repositories」** を選ぶ
+- 使うリポジトリ**だけ**を選んで **Install**
+
+> ⚠️ 「All repositories」を選ぶと、すべてのリポジトリを Claude が扱えるようになる。使うものだけを選ぶ。あとから増やすのは簡単（GitHub の Settings → Applications）。
+
+④ claude.ai/code の画面で、リポジトリの一覧に**自分のリポジトリが出れば完了**
 
 ---
 
