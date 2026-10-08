@@ -87,10 +87,11 @@ flowchart LR
 /config
 ```
 
-3. 設定の一覧から **「Enable Remote Control for all sessions」** を探し、**`true`** にする
+3. 設定の画面が開いたら、そのまま `remote` と打つ（設定が1行に絞り込まれる）
+4. **「Enable Remote Control for all sessions」** の行を ↓ キーで選び、Enter で **`true`** にする
+5. 行の右側が `true` になっていれば完了。**Esc** で設定の画面を閉じる
 
-<!-- TODO(PCのスクショ): /config の画面。Enable Remote Control for all sessions の行に赤枠 -->
-![/config でリモートコントロールを常にオンにする](images/rc-config.png)
+![/config で remote と打ち、Enable Remote Control for all sessions を true にする](images/rc-config.png)
 
 > 💡 これで、**これから起動する Claude は全部、自動でスマホからつながる状態**になる。毎回コマンドを打つ必要はない。
 
