@@ -89,10 +89,16 @@ Git 環境構築手順で `gh`（GitHub をターミナルから使う道具）�
 /web-setup
 ```
 
+途中まで打つと候補が出る。`/web-setup` が出ていれば、そのまま Enter でよい。
+
+![/web-setup と打つと候補が出る](images/web-setup-cmd.png)
+
 4. 「`gh` の情報を Claude のアカウントに送ってよいか」と聞かれるので、許可する
 5. **`Connected as （自分の GitHub のユーザー名）`** と出て、ブラウザで claude.ai/code が開けば完了
 
-<!-- TODO(PCのスクショ): /web-setup の実行結果。Connected as の行に赤枠（ユーザー名はマスク） -->
+> 💡 **「Connect cloud sessions to GitHub?」と出て、「You're already connected via the GitHub App」と書いてあるとき**は、すでにブラウザで GitHub とつないである。スマホでリポジトリを選べているなら、↓ キーで **「2. Cancel」** を選んで Enter（今のつなぎ方のまま使う）。
+>
+> ![すでにつないである場合の画面。2. Cancel を選ぶ](images/web-setup-already.png)
 
 > ⚠️ これで、**自分の GitHub のリポジトリ全部**を、クラウドの Claude が扱えるようになる。ただし、Claude が触るのは**自分でセッションを始めて選んだリポジトリだけ**。
 
