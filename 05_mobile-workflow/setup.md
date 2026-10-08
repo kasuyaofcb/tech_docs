@@ -139,8 +139,9 @@ flowchart LR
 
 帰ってから PC の Cursor を見て、`memo.md` ができていれば成功。
 
-<!-- TODO(PCのスクショ): Cursorのファイル一覧に memo.md ができている画面 -->
-![PCにmemo.mdができている](images/part1-goal.png)
+<img src="images/part1-goal.png" alt="Cursorのファイル一覧にmemo.mdができている" width="400">
+
+> 💡 ファイル名の右の **`U`** は「新しくできて、まだ Git に記録していないファイル」という印。
 
 > 💡 **うまく頼むコツ**: 「どこに」「何を」「どんな形で」を入れる。
 > - ❌「さっきのアイデアまとめて」
