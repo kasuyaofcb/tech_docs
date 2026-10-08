@@ -102,7 +102,12 @@ flowchart LR
 
 1. Cursor で、**作業したいプロジェクトのフォルダ**を開く
 2. Claude を起動する（ふだんどおりでよい。ターミナルの `claude` でも、Cursor の拡張機能の Claude でもどちらでも OK）
-3. Claude の入力欄の下に、青い **「Remote Control」** の表示が出ていることを確認する（1.5 の画像の右下の赤枠）
+3. Claude の入力欄の下に、青い **「Remote Control」** の表示が出ていることを確認する（出ていれば、スマホからつながる状態）
+
+![入力欄の下にRemote Controlの表示が出ている](images/rc-on-badge.png)
+
+※ 画像は Cursor の拡張機能の Claude の場合。
+
 4. **そのまま出かける**
 
 > 💡 **このフォルダが Claude の作業場所になる。** 外から頼んだメモや資料は、このフォルダの中に保存される。
